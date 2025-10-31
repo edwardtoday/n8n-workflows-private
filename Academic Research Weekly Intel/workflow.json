@@ -1,0 +1,515 @@
+{
+  "createdAt": "2025-10-23T08:45:00Z",
+  "updatedAt": "2025-10-23T08:45:00Z",
+  "id": "GOnQd4t0vVnJvPj6",
+  "name": "Academic Research Weekly Intel",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 7 * * 2",
+              "timezone": "Asia/Shanghai"
+            }
+          ]
+        }
+      },
+      "id": "7D5BFAD9-47C5-48D1-AE48-BADC633F7CBB",
+      "name": "Cron - Tuesday 07:00",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "academic-weekly-1d5752a1a7a14641a4c63e55",
+        "options": {}
+      },
+      "id": "C4B36A67-C5E1-46C5-8F04-61B24C8B2FF3",
+      "name": "Webhook - Manual Run",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1568,
+        144
+      ],
+      "webhookId": "9049776b-5eb9-4d71-8e01-0df5dc07b669"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8261994-0b2f-443c-bf28-2a6d11ee6c07",
+              "name": "runContext.trigger",
+              "type": "string",
+              "value": "scheduled"
+            },
+            {
+              "id": "7e05b06f-a6e8-413d-b9db-cd79899d0f9c",
+              "name": "runContext.triggeredAt",
+              "type": "string",
+              "value": "={{$now}}"
+            },
+            {
+              "id": "ca0f9682-9f0a-4050-9bb3-9df02b02e84b",
+              "name": "runContext.timezone",
+              "type": "string",
+              "value": "Asia/Shanghai"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6B926136-1AB0-4FC1-A6B8-8D4F4A9A2147",
+      "name": "Set Run Context (Cron)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8dcc32ab-20be-4139-a4c0-ec3615c6a4e1",
+              "name": "runContext.trigger",
+              "type": "string",
+              "value": "manual"
+            },
+            {
+              "id": "48b86463-cede-4442-92d7-be7cc5d4f9fd",
+              "name": "runContext.triggeredAt",
+              "type": "string",
+              "value": "={{$now}}"
+            },
+            {
+              "id": "0570c989-cc58-4069-b559-512e6dbfef41",
+              "name": "runContext.requestHeaders",
+              "type": "json",
+              "value": "={{$json.headers}}"
+            },
+            {
+              "id": "47482400-2ec8-408b-8a8a-c95d721fb107",
+              "name": "runContext.requestQuery",
+              "type": "json",
+              "value": "={{$json.query}}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "20E74E94-8328-4D62-88F3-51B5D3B46904",
+      "name": "Set Run Context (Webhook)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        144
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "8DA1DDC6-2A51-4C0E-92D4-6DA0CF886C51",
+      "name": "Merge Triggers",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1120,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst runContext = input.runContext || {};\nconst now = new Date();\nconst windowDays = 7;\nconst from = new Date(now.getTime() - windowDays * 24 * 60 * 60 * 1000);\n\nconst baseDomains = [\n  {\n    id: 'global-top',\n    label: '全站热门',\n    queries: [\n      '(artificial intelligence OR machine learning) AND NOT comment',\n      'foundation model OR multimodal OR generative AI',\n      'graph neural network OR large language model'\n    ],\n    labels: ['global', 'ai'],\n    weight: 1.2\n  },\n  {\n    id: 'software-dev',\n    label: '软件开发',\n    queries: [\n      'software engineering OR developer productivity',\n      'program analysis OR test automation'\n    ],\n    labels: ['software-dev'],\n    weight: 1\n  },\n  {\n    id: 'smart-hardware',\n    label: '智能硬件',\n    queries: [\n      'embedded systems OR edge computing',\n      'robotics hardware OR sensor fusion'\n    ],\n    labels: ['smart-hardware'],\n    weight: 1\n  },\n  {\n    id: 'led-lighting',\n    label: 'LED 照明',\n    queries: [\n      'LED lighting OR solid state lighting',\n      'smart lighting OR illumination system'\n    ],\n    labels: ['led', 'lighting'],\n    weight: 1\n  },\n  {\n    id: 'led-display',\n    label: 'LED 显示',\n    queries: [\n      'LED display OR microLED',\n      'digital signage display OR video wall'\n    ],\n    labels: ['led', 'display'],\n    weight: 1\n  },\n  {\n    id: 'image-processing',\n    label: '图像处理',\n    queries: [\n      'image processing OR image enhancement',\n      'computational photography'\n    ],\n    labels: ['image-processing'],\n    weight: 1\n  },\n  {\n    id: 'image-recognition',\n    label: '图像识别',\n    queries: [\n      'image recognition OR visual recognition',\n      'object detection OR segmentation'\n    ],\n    labels: ['image-recognition'],\n    weight: 1\n  },\n  {\n    id: 'ai-general',\n    label: '人工智能综合',\n    queries: [\n      'artificial intelligence OR machine learning',\n      'reinforcement learning OR autonomous agent'\n    ],\n    labels: ['ai'],\n    weight: 1.1\n  },\n  {\n    id: 'nlp',\n    label: '自然语言处理',\n    queries: [\n      'natural language processing OR NLP',\n      'large language model OR text generation'\n    ],\n    labels: ['nlp'],\n    weight: 1.1\n  }\n];\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe: {\n        from: from.toISOString(),\n        to: now.toISOString(),\n        windowDays\n      },\n      domains: baseDomains,\n      config: {\n        arxivMaxResults: 60,\n        openAlexPerQuery: 40,\n        semanticPerQuery: 30,\n        huggingFacePerQuery: 40\n      }\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst runContext = input.runContext || {};\nconst now = new Date();\nconst windowDays = 7;\nconst from = new Date(now.getTime() - windowDays * 24 * 60 * 60 * 1000);\n\nconst baseDomains = [\n  {\n    id: 'global-top',\n    label: '全站热门',\n    queries: [\n      '(artificial intelligence OR machine learning) AND NOT comment',\n      'foundation model OR multimodal OR generative AI',\n      'graph neural network OR large language model'\n    ],\n    labels: ['global', 'ai'],\n    weight: 1.2\n  },\n  {\n    id: 'software-dev',\n    label: '软件开发',\n    queries: [\n      'software engineering OR developer productivity',\n      'program analysis OR test automation'\n    ],\n    labels: ['software-dev'],\n    weight: 1\n  },\n  {\n    id: 'smart-hardware',\n    label: '智能硬件',\n    queries: [\n      'embedded systems OR edge computing',\n      'robotics hardware OR sensor fusion'\n    ],\n    labels: ['smart-hardware'],\n    weight: 1\n  },\n  {\n    id: 'led-lighting',\n    label: 'LED 照明',\n    queries: [\n      'LED lighting OR solid state lighting',\n      'smart lighting OR illumination system'\n    ],\n    labels: ['led', 'lighting'],\n    weight: 1\n  },\n  {\n    id: 'led-display',\n    label: 'LED 显示',\n    queries: [\n      'LED display OR microLED',\n      'digital signage display OR video wall'\n    ],\n    labels: ['led', 'display'],\n    weight: 1\n  },\n  {\n    id: 'image-processing',\n    label: '图像处理',\n    queries: [\n      'image processing OR image enhancement',\n      'computational photography'\n    ],\n    labels: ['image-processing'],\n    weight: 1\n  },\n  {\n    id: 'image-recognition',\n    label: '图像识别',\n    queries: [\n      'image recognition OR visual recognition',\n      'object detection OR segmentation'\n    ],\n    labels: ['image-recognition'],\n    weight: 1\n  },\n  {\n    id: 'ai-general',\n    label: '人工智能综合',\n    queries: [\n      'artificial intelligence OR machine learning',\n      'reinforcement learning OR autonomous agent'\n    ],\n    labels: ['ai'],\n    weight: 1.1\n  },\n  {\n    id: 'nlp',\n    label: '自然语言处理',\n    queries: [\n      'natural language processing OR NLP',\n      'large language model OR text generation'\n    ],\n    labels: ['nlp'],\n    weight: 1.1\n  }\n];\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe: {\n        from: from.toISOString(),\n        to: now.toISOString(),\n        windowDays\n      },\n      domains: baseDomains,\n      config: {\n        arxivMaxResults: 60,\n        openAlexPerQuery: 40,\n        semanticPerQuery: 30,\n        huggingFacePerQuery: 40\n      }\n    }\n  }\n];"
+      },
+      "id": "DD7C2B32-37BF-4F0C-A43F-55CC5DC721AC",
+      "name": "Keyword Registry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst { domains = [], timeframe, config = {}, runContext = {} } = input;\n\nconst arxivQueries = [];\nconst openAlexTargets = [];\nconst semanticTargets = [];\nconst huggingfaceTargets = [];\nconst interestDomains = ['software-dev', 'smart-hardware', 'led-lighting', 'led-display', 'image-processing', 'image-recognition', 'ai-general', 'nlp'];\n\nfor (const domain of domains) {\n  const baseWeight = domain.weight || 1;\n  const domainTags = Array.isArray(domain.labels) ? domain.labels : [];\n  const fallbackQuery = domain.queries?.[0] || '';\n\n  if (domain.id === 'global-top') {\n    arxivQueries.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'all:(ai OR \"machine learning\" OR \"deep learning\") AND submittedDate:[NOW-7DAY TO NOW]',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      maxResults: config.arxivMaxResults || 60\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'artificial intelligence',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      perPage: config.openAlexPerQuery || 40\n    });\n\n    huggingfaceTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      domainId: domain.id,\n      domainTags,\n      weight: 1.1,\n      limit: config.huggingFacePerQuery || 40\n    });\n  }\n\n  if (fallbackQuery) {\n    arxivQueries.push({\n      id: `${domain.id}-arxiv`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      maxResults: Math.min(config.arxivMaxResults || 60, domain.id === 'global-top' ? 60 : 45)\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-openalex`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      perPage: Math.min(config.openAlexPerQuery || 40, 40)\n    });\n\n    semanticTargets.push({\n      id: `${domain.id}-semantic`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      limit: Math.min(config.semanticPerQuery || 30, 30)\n    });\n  }\n}\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      arxivQueries,\n      openAlexTargets,\n      semanticTargets,\n      huggingfaceTargets\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst { domains = [], timeframe, config = {}, runContext = {} } = input;\n\nconst arxivQueries = [];\nconst openAlexTargets = [];\nconst semanticTargets = [];\nconst huggingfaceTargets = [];\nconst interestDomains = ['software-dev', 'smart-hardware', 'led-lighting', 'led-display', 'image-processing', 'image-recognition', 'ai-general', 'nlp'];\n\nfor (const domain of domains) {\n  const baseWeight = domain.weight || 1;\n  const domainTags = Array.isArray(domain.labels) ? domain.labels : [];\n  const fallbackQuery = domain.queries?.[0] || '';\n\n  if (domain.id === 'global-top') {\n    arxivQueries.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'all:(ai OR \"machine learning\" OR \"deep learning\") AND submittedDate:[NOW-7DAY TO NOW]',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      maxResults: config.arxivMaxResults || 60\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'artificial intelligence',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      perPage: config.openAlexPerQuery || 40\n    });\n\n    huggingfaceTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      domainId: domain.id,\n      domainTags,\n      weight: 1.1,\n      limit: config.huggingFacePerQuery || 40\n    });\n  }\n\n  if (fallbackQuery) {\n    arxivQueries.push({\n      id: `${domain.id}-arxiv`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      maxResults: Math.min(config.arxivMaxResults || 60, domain.id === 'global-top' ? 60 : 45)\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-openalex`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      perPage: Math.min(config.openAlexPerQuery || 40, 40)\n    });\n\n    semanticTargets.push({\n      id: `${domain.id}-semantic`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      limit: Math.min(config.semanticPerQuery || 30, 30)\n    });\n  }\n}\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      arxivQueries,\n      openAlexTargets,\n      semanticTargets,\n      huggingfaceTargets\n    }\n  }\n];"
+      },
+      "id": "F61F593E-CCA0-4FAE-A2F5-A8ACDF278252",
+      "name": "Build Sources",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const buildQuery = (params = {}) => Object.entries(params)\n  .filter(([, value]) => value !== undefined && value !== null && value !== '')\n  .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)\n  .join('&');\n\nconst input = items[0]?.json || {};\nconst {\n  runContext = {},\n  timeframe = {},\n  domains = [],\n  arxivQueries = [],\n  openAlexTargets = [],\n  semanticTargets = [],\n  huggingfaceTargets = [],\n  interestDomains = []\n} = input;\n\nconst fromTime = timeframe.from ? new Date(timeframe.from).getTime() : null;\nconst collected = [];\nconst diagnostics = [];\n\nconst decodeEntities = (text = '') => {\n  return text\n    .replace(/<!\\[CDATA\\[(.*?)]]>/gs, '$1')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\");\n};\n\nconst parseArxivAuthors = (block = '') => {\n  const matches = block.match(/<author>[\\s\\S]*?<name>([\\s\\S]*?)<\\/name>[\\s\\S]*?<\\/author>/gi) || [];\n  return matches\n    .map((entry) => {\n      const nameMatch = /<name>([\\s\\S]*?)<\\/name>/i.exec(entry);\n      return decodeEntities(nameMatch ? nameMatch[1].trim() : '').trim();\n    })\n    .filter(Boolean);\n};\n\nconst extractTag = (block = '', tag) => {\n  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');\n  const match = regex.exec(block);\n  return match ? decodeEntities(match[1].trim()) : '';\n};\n\nconst shouldKeep = (isoDate) => {\n  if (!fromTime || !isoDate) return true;\n  const ts = Date.parse(isoDate);\n  if (Number.isNaN(ts)) return true;\n  return ts >= fromTime;\n};\n\nconst collectArxiv = async () => {\n  for (const query of arxivQueries) {\n    const params = buildQuery({\n      search_query: query.query,\n      start: '0',\n      max_results: String(query.maxResults || 40),\n      sortBy: 'submittedDate',\n      sortOrder: 'descending'\n    });\n    const url = `https://export.arxiv.org/api/query?${params}`;\n    try {\n      const response = await this.helpers.httpRequest({\n        method: 'GET',\n        url,\n        headers: {\n          'User-Agent': 'AcademicIntelBot/1.0 (+https://sansi.com)',\n          Accept: 'application/atom+xml, application/xml;q=0.9, */*;q=0.8'\n        },\n        timeout: 25000,\n        responseFormat: 'string'\n      });\n\n      const xml = response.toString();\n      const entries = xml.match(/<entry[\\s\\S]*?<\\/entry>/gi) || [];\n      diagnostics.push({ source: 'arXiv', query: query.query, count: entries.length, status: 200 });\n\n      for (const entry of entries) {\n        const title = extractTag(entry, 'title');\n        const summary = extractTag(entry, 'summary');\n        const published = extractTag(entry, 'published') || extractTag(entry, 'updated');\n        const publishedAt = published ? new Date(published).toISOString() : null;\n        if (!shouldKeep(publishedAt)) continue;\n\n        const idMatch = /<id>([\\s\\S]*?)<\\/id>/i.exec(entry);\n        const linkMatch = /<link[^>]*rel=\"alternate\"[^>]*href=\"([^\"]+)\"[^>]*>/i.exec(entry) || /<link[^>]*href=\"([^\"]+)\"[^>]*>/i.exec(entry);\n        const pdfMatch = /<link[^>]*title=\"pdf\"[^>]*href=\"([^\"]+)\"[^>]*>/i.exec(entry);\n        const doi = extractTag(entry, 'arxiv:doi') || extractTag(entry, 'doi') || null;\n        const authors = parseArxivAuthors(entry);\n\n        collected.push({\n          source: 'arXiv',\n          sourceId: idMatch ? idMatch[1].trim() : null,\n          doi,\n          arxivId: idMatch ? idMatch[1].split('/abs/').pop() : null,\n          title: title.trim(),\n          abstract: summary.trim(),\n          publishedAt,\n          link: linkMatch ? linkMatch[1] : (idMatch ? idMatch[1] : null),\n          pdfUrl: pdfMatch ? pdfMatch[1] : null,\n          authors,\n          domainId: query.domainId,\n          domainTags: query.domainTags || [],\n          weights: {\n            source: query.weight || 1\n          },\n          metrics: {\n            citations: 0,\n            bookmarks: 0,\n            downloads: 0,\n            socialMentions: 0\n          },\n          raw: {\n            provider: 'arxiv',\n            queryId: query.id\n          }\n        });\n      }\n    } catch (error) {\n      diagnostics.push({ source: 'arXiv', query: query.query, error: error.message || 'request failed' });\n    }\n  }\n};\n\nconst collectOpenAlex = async () => {\n  for (const target of openAlexTargets) {\n    const params = buildQuery({\n      search: target.query,\n      filter: `from_publication_date:${timeframe.from?.slice(0, 10) || ''},to_publication_date:${timeframe.to?.slice(0, 10) || ''}`,\n      sort: 'cited_by_count:desc',\n      'per-page': String(target.perPage || 30)\n    });\n    const url = `https://api.openalex.org/works?${params}`;\n    try {\n      const response = await this.helpers.httpRequest({\n        method: 'GET',\n        url,\n        timeout: 25000,\n        json: true\n      });\n      const results = Array.isArray(response.results) ? response.results : [];\n      diagnostics.push({ source: 'OpenAlex', query: target.query, count: results.length, status: 200 });\n\n      for (const work of results) {\n        const publishedAt = work.publication_date || work.appearance?.published_date || null;\n        if (!shouldKeep(publishedAt)) continue;\n        const doi = work.doi || work.ids?.doi || null;\n        const id = work.id || null;\n        const primaryLocation = work.primary_location || {};\n        const authors = Array.isArray(work.authorships)\n          ? work.authorships.map((auth) => auth.author?.display_name).filter(Boolean)\n          : [];\n\n        collected.push({\n          source: 'OpenAlex',\n          sourceId: id,\n          doi,\n          title: work.display_name || work.title,\n          abstract: work.abstract_inverted_index ? Object.keys(work.abstract_inverted_index).join(' ') : work.abstract || '',\n          publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null,\n          link: primaryLocation?.source?.home_page_url || id?.replace('https://api.openalex.org/works/', 'https://openalex.org/'),\n          pdfUrl: primaryLocation?.pdf_url || null,\n          authors,\n          domainId: target.domainId,\n          domainTags: target.domainTags || [],\n          weights: {\n            source: target.weight || 1\n          },\n          metrics: {\n            citations: work.cited_by_count || 0,\n            bookmarks: 0,\n            downloads: 0,\n            socialMentions: 0\n          },\n          raw: {\n            provider: 'openalex',\n            queryId: target.id\n          }\n        });\n      }\n    } catch (error) {\n      diagnostics.push({ source: 'OpenAlex', query: target.query, error: error.message || 'request failed' });\n    }\n  }\n};\n\nconst collectSemantic = async () => {\n  for (const target of semanticTargets) {\n    const params = buildQuery({\n      query: target.query,\n      limit: String(target.limit || 20),\n      fields: 'title,abstract,url,venue,year,authors,citationCount,externalIds,publicationDate,journal,openAccessPdf,isOpenAccess'\n    });\n    const url = `https://api.semanticscholar.org/graph/v1/paper/search?${params}`;\n    try {\n      const response = await this.helpers.httpRequest({\n        method: 'GET',\n        url,\n        timeout: 25000,\n        json: true\n      });\n      const data = Array.isArray(response.data) ? response.data : [];\n      diagnostics.push({ source: 'SemanticScholar', query: target.query, count: data.length, status: 200 });\n\n      for (const paper of data) {\n        const publishedAt = paper.publicationDate || (paper.year ? `${paper.year}-01-01` : null);\n        if (!shouldKeep(publishedAt)) continue;\n        const doi = paper.externalIds?.DOI || paper.externalIds?.doi || null;\n        const arxivId = paper.externalIds?.ArXiv || paper.externalIds?.ARXIV || null;\n\n        collected.push({\n          source: 'SemanticScholar',\n          sourceId: paper.paperId || null,\n          doi,\n          arxivId,\n          title: paper.title,\n          abstract: paper.abstract || '',\n          publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null,\n          link: paper.url || (doi ? `https://doi.org/${doi}` : null),\n          pdfUrl: paper.openAccessPdf?.url || null,\n          authors: Array.isArray(paper.authors) ? paper.authors.map((author) => author.name).filter(Boolean) : [],\n          domainId: target.domainId,\n          domainTags: target.domainTags || [],\n          weights: {\n            source: target.weight || 1\n          },\n          metrics: {\n            citations: paper.citationCount || 0,\n            bookmarks: 0,\n            downloads: 0,\n            socialMentions: 0\n          },\n          raw: {\n            provider: 'semantic-scholar',\n            queryId: target.id\n          }\n        });\n      }\n    } catch (error) {\n      diagnostics.push({ source: 'SemanticScholar', query: target.query, error: error.message || 'request failed' });\n    }\n  }\n};\n\nconst collectHuggingFace = async () => {\n  if (!huggingfaceTargets.length) return;\n  try {\n    const response = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'https://huggingface.co/api/papers?sort=trending&limit=60',\n      timeout: 20000,\n      json: true\n    });\n    const papers = Array.isArray(response) ? response : Array.isArray(response.data) ? response.data : [];\n    diagnostics.push({ source: 'HuggingFace', query: 'trending', count: papers.length, status: 200 });\n\n    for (const paper of papers) {\n      const publishedAt = paper.createdAt || paper.updatedAt || null;\n      if (!shouldKeep(publishedAt)) continue;\n      const doi = paper.doi || paper.externalIds?.doi || null;\n      const arxivId = paper.arxivId || null;\n      const title = paper.title || paper.paperTitle;\n      const authors = Array.isArray(paper.authors) ? paper.authors : (paper.author ? [paper.author] : []);\n\n      collected.push({\n        source: 'HuggingFace',\n        sourceId: paper.id || paper.paperUrl,\n        doi,\n        arxivId,\n        title,\n        abstract: paper.summary || paper.abstract || '',\n        publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null,\n        link: paper.paperUrl || paper.url || (arxivId ? `https://arxiv.org/abs/${arxivId}` : null),\n        pdfUrl: paper.pdfUrl || (arxivId ? `https://arxiv.org/pdf/${arxivId}.pdf` : null),\n        authors,\n        domainId: 'ai-general',\n        domainTags: ['ai', 'ml'],\n        weights: {\n          source: 1.1\n        },\n        metrics: {\n          citations: paper.metrics?.citations || 0,\n          bookmarks: paper.metrics?.bookmarks || paper.upvotes || 0,\n          downloads: paper.metrics?.downloads || 0,\n          socialMentions: paper.metrics?.tweets || paper.tweets || 0\n        },\n        raw: {\n          provider: 'huggingface'\n        }\n      });\n    }\n  } catch (error) {\n    diagnostics.push({ source: 'HuggingFace', query: 'trending', error: error.message || 'request failed' });\n  }\n};\n\nawait collectArxiv();\nawait collectOpenAlex();\nawait collectSemantic();\nawait collectHuggingFace();\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      candidates: collected,\n      diagnostics\n    }\n  }\n];",
+        "functionCode": "const buildQuery = (params = {}) => Object.entries(params)\n  .filter(([, value]) => value !== undefined && value !== null && value !== '')\n  .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)\n  .join('&');\n\nconst input = items[0]?.json || {};\nconst {\n  runContext = {},\n  timeframe = {},\n  domains = [],\n  arxivQueries = [],\n  openAlexTargets = [],\n  semanticTargets = [],\n  huggingfaceTargets = [],\n  interestDomains = []\n} = input;\n\nconst fromTime = timeframe.from ? new Date(timeframe.from).getTime() : null;\nconst collected = [];\nconst diagnostics = [];\n\nconst decodeEntities = (text = '') => {\n  return text\n    .replace(/<!\\[CDATA\\[(.*?)]]>/gs, '$1')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\");\n};\n\nconst parseArxivAuthors = (block = '') => {\n  const matches = block.match(/<author>[\\s\\S]*?<name>([\\s\\S]*?)<\\/name>[\\s\\S]*?<\\/author>/gi) || [];\n  return matches\n    .map((entry) => {\n      const nameMatch = /<name>([\\s\\S]*?)<\\/name>/i.exec(entry);\n      return decodeEntities(nameMatch ? nameMatch[1].trim() : '').trim();\n    })\n    .filter(Boolean);\n};\n\nconst extractTag = (block = '', tag) => {\n  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');\n  const match = regex.exec(block);\n  return match ? decodeEntities(match[1].trim()) : '';\n};\n\nconst shouldKeep = (isoDate) => {\n  if (!fromTime || !isoDate) return true;\n  const ts = Date.parse(isoDate);\n  if (Number.isNaN(ts)) return true;\n  return ts >= fromTime;\n};\n\nconst collectArxiv = async () => {\n  for (const query of arxivQueries) {\n    const params = buildQuery({\n      search_query: query.query,\n      start: '0',\n      max_results: String(query.maxResults || 40),\n      sortBy: 'submittedDate',\n      sortOrder: 'descending'\n    });\n    const url = `https://export.arxiv.org/api/query?${params}`;\n    try {\n      const response = await this.helpers.httpRequest({\n        method: 'GET',\n        url,\n        headers: {\n          'User-Agent': 'AcademicIntelBot/1.0 (+https://sansi.com)',\n          Accept: 'application/atom+xml, application/xml;q=0.9, */*;q=0.8'\n        },\n        timeout: 25000,\n        responseFormat: 'string'\n      });\n\n      const xml = response.toString();\n      const entries = xml.match(/<entry[\\s\\S]*?<\\/entry>/gi) || [];\n      diagnostics.push({ source: 'arXiv', query: query.query, count: entries.length, status: 200 });\n\n      for (const entry of entries) {\n        const title = extractTag(entry, 'title');\n        const summary = extractTag(entry, 'summary');\n        const published = extractTag(entry, 'published') || extractTag(entry, 'updated');\n        const publishedAt = published ? new Date(published).toISOString() : null;\n        if (!shouldKeep(publishedAt)) continue;\n\n        const idMatch = /<id>([\\s\\S]*?)<\\/id>/i.exec(entry);\n        const linkMatch = /<link[^>]*rel=\"alternate\"[^>]*href=\"([^\"]+)\"[^>]*>/i.exec(entry) || /<link[^>]*href=\"([^\"]+)\"[^>]*>/i.exec(entry);\n        const pdfMatch = /<link[^>]*title=\"pdf\"[^>]*href=\"([^\"]+)\"[^>]*>/i.exec(entry);\n        const doi = extractTag(entry, 'arxiv:doi') || extractTag(entry, 'doi') || null;\n        const authors = parseArxivAuthors(entry);\n\n        collected.push({\n          source: 'arXiv',\n          sourceId: idMatch ? idMatch[1].trim() : null,\n          doi,\n          arxivId: idMatch ? idMatch[1].split('/abs/').pop() : null,\n          title: title.trim(),\n          abstract: summary.trim(),\n          publishedAt,\n          link: linkMatch ? linkMatch[1] : (idMatch ? idMatch[1] : null),\n          pdfUrl: pdfMatch ? pdfMatch[1] : null,\n          authors,\n          domainId: query.domainId,\n          domainTags: query.domainTags || [],\n          weights: {\n            source: query.weight || 1\n          },\n          metrics: {\n            citations: 0,\n            bookmarks: 0,\n            downloads: 0,\n            socialMentions: 0\n          },\n          raw: {\n            provider: 'arxiv',\n            queryId: query.id\n          }\n        });\n      }\n    } catch (error) {\n      diagnostics.push({ source: 'arXiv', query: query.query, error: error.message || 'request failed' });\n    }\n  }\n};\n\nconst collectOpenAlex = async () => {\n  for (const target of openAlexTargets) {\n    const params = buildQuery({\n      search: target.query,\n      filter: `from_publication_date:${timeframe.from?.slice(0, 10) || ''},to_publication_date:${timeframe.to?.slice(0, 10) || ''}`,\n      sort: 'cited_by_count:desc',\n      'per-page': String(target.perPage || 30)\n    });\n    const url = `https://api.openalex.org/works?${params}`;\n    try {\n      const response = await this.helpers.httpRequest({\n        method: 'GET',\n        url,\n        timeout: 25000,\n        json: true\n      });\n      const results = Array.isArray(response.results) ? response.results : [];\n      diagnostics.push({ source: 'OpenAlex', query: target.query, count: results.length, status: 200 });\n\n      for (const work of results) {\n        const publishedAt = work.publication_date || work.appearance?.published_date || null;\n        if (!shouldKeep(publishedAt)) continue;\n        const doi = work.doi || work.ids?.doi || null;\n        const id = work.id || null;\n        const primaryLocation = work.primary_location || {};\n        const authors = Array.isArray(work.authorships)\n          ? work.authorships.map((auth) => auth.author?.display_name).filter(Boolean)\n          : [];\n\n        collected.push({\n          source: 'OpenAlex',\n          sourceId: id,\n          doi,\n          title: work.display_name || work.title,\n          abstract: work.abstract_inverted_index ? Object.keys(work.abstract_inverted_index).join(' ') : work.abstract || '',\n          publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null,\n          link: primaryLocation?.source?.home_page_url || id?.replace('https://api.openalex.org/works/', 'https://openalex.org/'),\n          pdfUrl: primaryLocation?.pdf_url || null,\n          authors,\n          domainId: target.domainId,\n          domainTags: target.domainTags || [],\n          weights: {\n            source: target.weight || 1\n          },\n          metrics: {\n            citations: work.cited_by_count || 0,\n            bookmarks: 0,\n            downloads: 0,\n            socialMentions: 0\n          },\n          raw: {\n            provider: 'openalex',\n            queryId: target.id\n          }\n        });\n      }\n    } catch (error) {\n      diagnostics.push({ source: 'OpenAlex', query: target.query, error: error.message || 'request failed' });\n    }\n  }\n};\n\nconst collectSemantic = async () => {\n  for (const target of semanticTargets) {\n    const params = buildQuery({\n      query: target.query,\n      limit: String(target.limit || 20),\n      fields: 'title,abstract,url,venue,year,authors,citationCount,externalIds,publicationDate,journal,openAccessPdf,isOpenAccess'\n    });\n    const url = `https://api.semanticscholar.org/graph/v1/paper/search?${params}`;\n    try {\n      const response = await this.helpers.httpRequest({\n        method: 'GET',\n        url,\n        timeout: 25000,\n        json: true\n      });\n      const data = Array.isArray(response.data) ? response.data : [];\n      diagnostics.push({ source: 'SemanticScholar', query: target.query, count: data.length, status: 200 });\n\n      for (const paper of data) {\n        const publishedAt = paper.publicationDate || (paper.year ? `${paper.year}-01-01` : null);\n        if (!shouldKeep(publishedAt)) continue;\n        const doi = paper.externalIds?.DOI || paper.externalIds?.doi || null;\n        const arxivId = paper.externalIds?.ArXiv || paper.externalIds?.ARXIV || null;\n\n        collected.push({\n          source: 'SemanticScholar',\n          sourceId: paper.paperId || null,\n          doi,\n          arxivId,\n          title: paper.title,\n          abstract: paper.abstract || '',\n          publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null,\n          link: paper.url || (doi ? `https://doi.org/${doi}` : null),\n          pdfUrl: paper.openAccessPdf?.url || null,\n          authors: Array.isArray(paper.authors) ? paper.authors.map((author) => author.name).filter(Boolean) : [],\n          domainId: target.domainId,\n          domainTags: target.domainTags || [],\n          weights: {\n            source: target.weight || 1\n          },\n          metrics: {\n            citations: paper.citationCount || 0,\n            bookmarks: 0,\n            downloads: 0,\n            socialMentions: 0\n          },\n          raw: {\n            provider: 'semantic-scholar',\n            queryId: target.id\n          }\n        });\n      }\n    } catch (error) {\n      diagnostics.push({ source: 'SemanticScholar', query: target.query, error: error.message || 'request failed' });\n    }\n  }\n};\n\nconst collectHuggingFace = async () => {\n  if (!huggingfaceTargets.length) return;\n  try {\n    const response = await this.helpers.httpRequest({\n      method: 'GET',\n      url: 'https://huggingface.co/api/papers?sort=trending&limit=60',\n      timeout: 20000,\n      json: true\n    });\n    const papers = Array.isArray(response) ? response : Array.isArray(response.data) ? response.data : [];\n    diagnostics.push({ source: 'HuggingFace', query: 'trending', count: papers.length, status: 200 });\n\n    for (const paper of papers) {\n      const publishedAt = paper.createdAt || paper.updatedAt || null;\n      if (!shouldKeep(publishedAt)) continue;\n      const doi = paper.doi || paper.externalIds?.doi || null;\n      const arxivId = paper.arxivId || null;\n      const title = paper.title || paper.paperTitle;\n      const authors = Array.isArray(paper.authors) ? paper.authors : (paper.author ? [paper.author] : []);\n\n      collected.push({\n        source: 'HuggingFace',\n        sourceId: paper.id || paper.paperUrl,\n        doi,\n        arxivId,\n        title,\n        abstract: paper.summary || paper.abstract || '',\n        publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null,\n        link: paper.paperUrl || paper.url || (arxivId ? `https://arxiv.org/abs/${arxivId}` : null),\n        pdfUrl: paper.pdfUrl || (arxivId ? `https://arxiv.org/pdf/${arxivId}.pdf` : null),\n        authors,\n        domainId: 'ai-general',\n        domainTags: ['ai', 'ml'],\n        weights: {\n          source: 1.1\n        },\n        metrics: {\n          citations: paper.metrics?.citations || 0,\n          bookmarks: paper.metrics?.bookmarks || paper.upvotes || 0,\n          downloads: paper.metrics?.downloads || 0,\n          socialMentions: paper.metrics?.tweets || paper.tweets || 0\n        },\n        raw: {\n          provider: 'huggingface'\n        }\n      });\n    }\n  } catch (error) {\n    diagnostics.push({ source: 'HuggingFace', query: 'trending', error: error.message || 'request failed' });\n  }\n};\n\nawait collectArxiv();\nawait collectOpenAlex();\nawait collectSemantic();\nawait collectHuggingFace();\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      candidates: collected,\n      diagnostics\n    }\n  }\n];"
+      },
+      "id": "E7796FFE-2B34-4181-A252-7A38252075D5",
+      "name": "Fetch Papers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst candidates = Array.isArray(input.candidates) ? input.candidates : [];\nconst domains = Array.isArray(input.domains) ? input.domains : [];\nconst interestDomains = Array.isArray(input.interestDomains) ? input.interestDomains : [];\nconst diagnostics = Array.isArray(input.diagnostics) ? input.diagnostics : [];\nconst runContext = input.runContext || {};\nconst timeframe = input.timeframe || {};\n\nconst domainMap = new Map(domains.map((domain) => [domain.id, domain]));\nconst seen = new Set();\nconst deduped = [];\n\nconst makeKey = (paper) => {\n  if (paper.doi) return `doi:${paper.doi.toLowerCase()}`;\n  if (paper.arxivId) return `arxiv:${paper.arxivId.toLowerCase()}`;\n  if (paper.sourceId) return `src:${paper.source}:${paper.sourceId}`;\n  const fallback = `${paper.title || ''}::${paper.publishedAt || ''}`.toLowerCase();\n  return `title:${fallback}`;\n};\n\nfor (const paper of candidates) {\n  const key = makeKey(paper);\n  if (seen.has(key)) continue;\n  seen.add(key);\n  paper.uniqueKey = key;\n  deduped.push(paper);\n}\n\nconst nowTs = timeframe.to ? Date.parse(timeframe.to) : Date.now();\nconst safeNow = Number.isNaN(nowTs) ? Date.now() : nowTs;\n\nconst recencyWeight = (iso) => {\n  if (!iso) return 0.35;\n  const ts = Date.parse(iso);\n  if (Number.isNaN(ts)) return 0.35;\n  const diffDays = Math.max(0, (safeNow - ts) / (24 * 60 * 60 * 1000));\n  return Math.min(1, Math.exp(-diffDays / 3));\n};\n\nconst popularityWeight = (metrics = {}) => {\n  const citations = metrics.citations || 0;\n  const bookmarks = metrics.bookmarks || 0;\n  const downloads = metrics.downloads || 0;\n  const base = Math.max(citations, bookmarks * 0.6, downloads * 0.25);\n  return Math.min(1, Math.log1p(base) / 5);\n};\n\nconst engagementWeight = (metrics = {}) => {\n  const mentions = metrics.socialMentions || 0;\n  return Math.min(1, Math.log1p(mentions) / 4);\n};\n\nconst domainPriority = (paper) => {\n  const id = (paper.domainId || '').toLowerCase();\n  if (interestDomains.includes(id)) return 1;\n  const tags = Array.isArray(paper.domainTags) ? paper.domainTags.map((tag) => tag.toLowerCase()) : [];\n  return tags.some((tag) => interestDomains.includes(tag)) ? 0.7 : 0;\n};\n\nfor (const paper of deduped) {\n  const scoreComponents = {\n    recency: recencyWeight(paper.publishedAt),\n    popularity: popularityWeight(paper.metrics),\n    engagement: engagementWeight(paper.metrics),\n    domain: domainPriority(paper)\n  };\n  const score = (40 * scoreComponents.recency)\n    + (35 * scoreComponents.popularity)\n    + (15 * scoreComponents.engagement)\n    + (10 * scoreComponents.domain);\n  paper.scoreComponents = scoreComponents;\n  paper.score = Number(score.toFixed(4));\n}\n\ndeduped.sort((a, b) => b.score - a.score);\n\nconst mapPaper = (paper) => ({\n  title: paper.title,\n  authors: paper.authors || [],\n  abstract: paper.abstract || '',\n  publishedAt: paper.publishedAt || null,\n  link: paper.link || null,\n  pdfUrl: paper.pdfUrl || null,\n  doi: paper.doi || null,\n  arxivId: paper.arxivId || null,\n  source: paper.source,\n  domainId: paper.domainId || null,\n  domainTags: paper.domainTags || [],\n  score: paper.score,\n  scoreComponents: paper.scoreComponents,\n  metrics: paper.metrics || {},\n  uniqueKey: paper.uniqueKey\n});\n\nconst overallTop = deduped.slice(0, 10).map(mapPaper);\nconst overallKeys = new Set(overallTop.map((paper) => paper.uniqueKey));\n\nconst domainHighlights = [];\nlet domainCounter = 0;\n\nconst domainOrder = interestDomains.length ? interestDomains : domains.map((domain) => domain.id);\n\nfor (const domainId of domainOrder) {\n  if (domainCounter >= 10) break;\n  const domainPapers = deduped.filter((paper) => {\n    if (paper.uniqueKey && overallKeys.has(paper.uniqueKey)) return false;\n    if (paper.domainId && paper.domainId.toLowerCase() === domainId.toLowerCase()) return true;\n    const tags = Array.isArray(paper.domainTags) ? paper.domainTags.map((tag) => tag.toLowerCase()) : [];\n    return tags.includes(domainId.toLowerCase());\n  });\n  if (!domainPapers.length) continue;\n  const chosen = [];\n  for (const paper of domainPapers) {\n    if (domainCounter >= 10) break;\n    if (overallKeys.has(paper.uniqueKey)) continue;\n    chosen.push(mapPaper(paper));\n    overallKeys.add(paper.uniqueKey);\n    domainCounter += 1;\n    if (chosen.length >= 2) break;\n  }\n  if (chosen.length) {\n    const meta = domainMap.get(domainId) || {};\n    domainHighlights.push({\n      domainId,\n      domainLabel: meta.label || domainId,\n      items: chosen\n    });\n  }\n}\n\nif (domainCounter < 10) {\n  for (const paper of deduped) {\n    if (domainCounter >= 10) break;\n    if (overallKeys.has(paper.uniqueKey)) continue;\n    domainHighlights.push({\n      domainId: paper.domainId || 'additional',\n      domainLabel: domainMap.get(paper.domainId || '')?.label || '补充热点',\n      items: [mapPaper(paper)]\n    });\n    overallKeys.add(paper.uniqueKey);\n    domainCounter += 1;\n  }\n}\n\nconst stats = {\n  candidateCount: candidates.length,\n  dedupedCount: deduped.length,\n  overallCount: overallTop.length,\n  domainCount: domainCounter,\n  diagnosticsCount: diagnostics.length\n};\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      stats,\n      diagnostics,\n      overallTop,\n      domainHighlights\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst candidates = Array.isArray(input.candidates) ? input.candidates : [];\nconst domains = Array.isArray(input.domains) ? input.domains : [];\nconst interestDomains = Array.isArray(input.interestDomains) ? input.interestDomains : [];\nconst diagnostics = Array.isArray(input.diagnostics) ? input.diagnostics : [];\nconst runContext = input.runContext || {};\nconst timeframe = input.timeframe || {};\n\nconst domainMap = new Map(domains.map((domain) => [domain.id, domain]));\nconst seen = new Set();\nconst deduped = [];\n\nconst makeKey = (paper) => {\n  if (paper.doi) return `doi:${paper.doi.toLowerCase()}`;\n  if (paper.arxivId) return `arxiv:${paper.arxivId.toLowerCase()}`;\n  if (paper.sourceId) return `src:${paper.source}:${paper.sourceId}`;\n  const fallback = `${paper.title || ''}::${paper.publishedAt || ''}`.toLowerCase();\n  return `title:${fallback}`;\n};\n\nfor (const paper of candidates) {\n  const key = makeKey(paper);\n  if (seen.has(key)) continue;\n  seen.add(key);\n  paper.uniqueKey = key;\n  deduped.push(paper);\n}\n\nconst nowTs = timeframe.to ? Date.parse(timeframe.to) : Date.now();\nconst safeNow = Number.isNaN(nowTs) ? Date.now() : nowTs;\n\nconst recencyWeight = (iso) => {\n  if (!iso) return 0.35;\n  const ts = Date.parse(iso);\n  if (Number.isNaN(ts)) return 0.35;\n  const diffDays = Math.max(0, (safeNow - ts) / (24 * 60 * 60 * 1000));\n  return Math.min(1, Math.exp(-diffDays / 3));\n};\n\nconst popularityWeight = (metrics = {}) => {\n  const citations = metrics.citations || 0;\n  const bookmarks = metrics.bookmarks || 0;\n  const downloads = metrics.downloads || 0;\n  const base = Math.max(citations, bookmarks * 0.6, downloads * 0.25);\n  return Math.min(1, Math.log1p(base) / 5);\n};\n\nconst engagementWeight = (metrics = {}) => {\n  const mentions = metrics.socialMentions || 0;\n  return Math.min(1, Math.log1p(mentions) / 4);\n};\n\nconst domainPriority = (paper) => {\n  const id = (paper.domainId || '').toLowerCase();\n  if (interestDomains.includes(id)) return 1;\n  const tags = Array.isArray(paper.domainTags) ? paper.domainTags.map((tag) => tag.toLowerCase()) : [];\n  return tags.some((tag) => interestDomains.includes(tag)) ? 0.7 : 0;\n};\n\nfor (const paper of deduped) {\n  const scoreComponents = {\n    recency: recencyWeight(paper.publishedAt),\n    popularity: popularityWeight(paper.metrics),\n    engagement: engagementWeight(paper.metrics),\n    domain: domainPriority(paper)\n  };\n  const score = (40 * scoreComponents.recency)\n    + (35 * scoreComponents.popularity)\n    + (15 * scoreComponents.engagement)\n    + (10 * scoreComponents.domain);\n  paper.scoreComponents = scoreComponents;\n  paper.score = Number(score.toFixed(4));\n}\n\ndeduped.sort((a, b) => b.score - a.score);\n\nconst mapPaper = (paper) => ({\n  title: paper.title,\n  authors: paper.authors || [],\n  abstract: paper.abstract || '',\n  publishedAt: paper.publishedAt || null,\n  link: paper.link || null,\n  pdfUrl: paper.pdfUrl || null,\n  doi: paper.doi || null,\n  arxivId: paper.arxivId || null,\n  source: paper.source,\n  domainId: paper.domainId || null,\n  domainTags: paper.domainTags || [],\n  score: paper.score,\n  scoreComponents: paper.scoreComponents,\n  metrics: paper.metrics || {},\n  uniqueKey: paper.uniqueKey\n});\n\nconst overallTop = deduped.slice(0, 10).map(mapPaper);\nconst overallKeys = new Set(overallTop.map((paper) => paper.uniqueKey));\n\nconst domainHighlights = [];\nlet domainCounter = 0;\n\nconst domainOrder = interestDomains.length ? interestDomains : domains.map((domain) => domain.id);\n\nfor (const domainId of domainOrder) {\n  if (domainCounter >= 10) break;\n  const domainPapers = deduped.filter((paper) => {\n    if (paper.uniqueKey && overallKeys.has(paper.uniqueKey)) return false;\n    if (paper.domainId && paper.domainId.toLowerCase() === domainId.toLowerCase()) return true;\n    const tags = Array.isArray(paper.domainTags) ? paper.domainTags.map((tag) => tag.toLowerCase()) : [];\n    return tags.includes(domainId.toLowerCase());\n  });\n  if (!domainPapers.length) continue;\n  const chosen = [];\n  for (const paper of domainPapers) {\n    if (domainCounter >= 10) break;\n    if (overallKeys.has(paper.uniqueKey)) continue;\n    chosen.push(mapPaper(paper));\n    overallKeys.add(paper.uniqueKey);\n    domainCounter += 1;\n    if (chosen.length >= 2) break;\n  }\n  if (chosen.length) {\n    const meta = domainMap.get(domainId) || {};\n    domainHighlights.push({\n      domainId,\n      domainLabel: meta.label || domainId,\n      items: chosen\n    });\n  }\n}\n\nif (domainCounter < 10) {\n  for (const paper of deduped) {\n    if (domainCounter >= 10) break;\n    if (overallKeys.has(paper.uniqueKey)) continue;\n    domainHighlights.push({\n      domainId: paper.domainId || 'additional',\n      domainLabel: domainMap.get(paper.domainId || '')?.label || '补充热点',\n      items: [mapPaper(paper)]\n    });\n    overallKeys.add(paper.uniqueKey);\n    domainCounter += 1;\n  }\n}\n\nconst stats = {\n  candidateCount: candidates.length,\n  dedupedCount: deduped.length,\n  overallCount: overallTop.length,\n  domainCount: domainCounter,\n  diagnosticsCount: diagnostics.length\n};\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      stats,\n      diagnostics,\n      overallTop,\n      domainHighlights\n    }\n  }\n];"
+      },
+      "id": "4E51F4DB-02F2-4777-8B31-68738C3AF864",
+      "name": "Score & Split",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst overallTop = Array.isArray(input.overallTop) ? input.overallTop : [];\nconst domainHighlights = Array.isArray(input.domainHighlights) ? input.domainHighlights : [];\nconst stats = input.stats || {};\nconst timeframe = input.timeframe || {};\n\nconst schemaDescription = `{\n  \"meta\": {\n    \"timeframe\": {\"from\": \"ISO8601\", \"to\": \"ISO8601\", \"windowDays\": number},\n    \"counts\": {\"overall\": number, \"domain\": number},\n    \"tone\": \"zh-Hans\"\n  },\n  \"globalTop\": [\n    {\n      \"title\": string,\n      \"primaryLink\": string,\n      \"authors\": [string],\n      \"publishedAt\": string,\n      \"teachingSummary\": string,\n      \"keyKeywords\": [string],\n      \"whyItMatters\": string,\n      \"impactForBusiness\": string,\n      \"recommendedActions\": [string],\n      \"furtherLinks\": [string]\n    }\n  ],\n  \"domains\": [\n    {\n      \"domainId\": string,\n      \"domainLabel\": string,\n      \"items\": [same structure as globalTop]\n    }\n  ],\n  \"glossary\": [\n    {\"term\": string, \"definition\": string}\n  ]\n}`;\n\nconst promptParts = [\n  '# 任务',\n  '你是一名资深研究员，需要面向非专业的产品/市场团队，用中文解释过去 7 天最热的学术论文。',\n  '',\n  '## 输入数据（JSON）',\n  JSON.stringify({ overallTop, domainHighlights, stats, timeframe }, null, 2),\n  '',\n  '## 输出要求',\n  '- 仅输出一个 JSON 对象，结构必须与 schema 完全一致。',\n  '- 所有说明请用简体中文，避免术语堆砌，可适当给出类比。',\n  '- `teachingSummary` 用 2-3 句通俗话解释核心贡献，突出“为什么重要”。',\n  '- `whyItMatters` 聚焦对 LED/智能硬件/软件团队的启发或市场影响。',\n  '- 如有具体数据 (参数、指标、成本等) 请写入 `impactForBusiness`。',\n  '- `recommendedActions` 列出我们可做的 1-2 个动作，不要泛泛地写“持续关注”。',\n  '- 如无可用链接，`furtherLinks` 可留空数组。',\n  '- `glossary` 选取 3-5 个初学者可能陌生的概念。',\n  '',\n  '## 输出 schema',\n  schemaDescription,\n  '',\n  '只输出 JSON，不要额外解释。'\n];\n\nconst newline = String.fromCharCode(10);\nconst prompt = promptParts.join(newline);\n\nreturn [\n  {\n    json: {\n      prompt,\n      rawInput: { overallTop, domainHighlights, stats, timeframe }\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst overallTop = Array.isArray(input.overallTop) ? input.overallTop : [];\nconst domainHighlights = Array.isArray(input.domainHighlights) ? input.domainHighlights : [];\nconst stats = input.stats || {};\nconst timeframe = input.timeframe || {};\n\nconst schemaDescription = `{\n  \"meta\": {\n    \"timeframe\": {\"from\": \"ISO8601\", \"to\": \"ISO8601\", \"windowDays\": number},\n    \"counts\": {\"overall\": number, \"domain\": number},\n    \"tone\": \"zh-Hans\"\n  },\n  \"globalTop\": [\n    {\n      \"title\": string,\n      \"primaryLink\": string,\n      \"authors\": [string],\n      \"publishedAt\": string,\n      \"teachingSummary\": string,\n      \"keyKeywords\": [string],\n      \"whyItMatters\": string,\n      \"impactForBusiness\": string,\n      \"recommendedActions\": [string],\n      \"furtherLinks\": [string]\n    }\n  ],\n  \"domains\": [\n    {\n      \"domainId\": string,\n      \"domainLabel\": string,\n      \"items\": [same structure as globalTop]\n    }\n  ],\n  \"glossary\": [\n    {\"term\": string, \"definition\": string}\n  ]\n}`;\n\nconst promptParts = [\n  '# 任务',\n  '你是一名资深研究员，需要面向非专业的产品/市场团队，用中文解释过去 7 天最热的学术论文。',\n  '',\n  '## 输入数据（JSON）',\n  JSON.stringify({ overallTop, domainHighlights, stats, timeframe }, null, 2),\n  '',\n  '## 输出要求',\n  '- 仅输出一个 JSON 对象，结构必须与 schema 完全一致。',\n  '- 所有说明请用简体中文，避免术语堆砌，可适当给出类比。',\n  '- `teachingSummary` 用 2-3 句通俗话解释核心贡献，突出“为什么重要”。',\n  '- `whyItMatters` 聚焦对 LED/智能硬件/软件团队的启发或市场影响。',\n  '- 如有具体数据 (参数、指标、成本等) 请写入 `impactForBusiness`。',\n  '- `recommendedActions` 列出我们可做的 1-2 个动作，不要泛泛地写“持续关注”。',\n  '- 如无可用链接，`furtherLinks` 可留空数组。',\n  '- `glossary` 选取 3-5 个初学者可能陌生的概念。',\n  '',\n  '## 输出 schema',\n  schemaDescription,\n  '',\n  '只输出 JSON，不要额外解释。'\n];\n\nconst newline = String.fromCharCode(10);\nconst prompt = promptParts.join(newline);\n\nreturn [\n  {\n    json: {\n      prompt,\n      rawInput: { overallTop, domainHighlights, stats, timeframe }\n    }\n  }\n];"
+      },
+      "id": "B2DF070F-A9AD-41B8-A393-5FE0D8B1B0A8",
+      "name": "Prepare Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.prompt}}",
+        "model": "google/gemini-2.5-flash"
+      },
+      "id": "52A64F35-1F0D-4A5D-9BF1-888DD0B902D4",
+      "name": "Summarize Papers",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        416,
+        48
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "openRouterApi": {
+          "id": "XV1sqh2GdIy4Daz1",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst rawCandidate = input.text ?? input.output ?? input.result ?? '';\nconst rawText = typeof rawCandidate === 'string' ? rawCandidate : JSON.stringify(rawCandidate);\nconst stats = input.stats || {};\nconst runContext = input.runContext || {};\nconst promptFragments = input.promptFragments || {};\nlet report = null;\nlet parseOk = false;\nlet parseError = '';\n\nconst stripCodeFence = (text = '') => {\n  if (!text.trim().startsWith('```')) return text;\n  const lines = text.trim().split(/\\r?\\n/);\n  if (lines.length >= 2) {\n    if (/^```/i.test(lines[0])) {\n      lines.shift();\n    }\n    while (lines.length && /^```/i.test(lines[lines.length - 1].trim())) {\n      lines.pop();\n    }\n    const newline = String.fromCharCode(10);\n    return lines.join(newline).trim();\n  }\n  return text;\n};\n\nif (!rawText) {\n  parseError = 'LLM 返回为空，缺少 JSON 字符串';\n} else {\n  const candidates = [rawText, stripCodeFence(rawText)];\n  for (const candidate of candidates) {\n    if (!candidate || parseOk) continue;\n    try {\n      report = JSON.parse(candidate);\n      parseOk = true;\n    } catch (error) {\n      parseError = `${error.name || 'Error'}: ${error.message}`;\n    }\n  }\n}\n\nreturn [\n  {\n    json: {\n      rawText,\n      report,\n      parseOk,\n      parseError,\n      stats,\n      runContext,\n      generatedAt: input.generatedAt || new Date().toISOString(),\n      promptFragments,\n      attempt: (input.attempt || 0) + 1\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst rawCandidate = input.text ?? input.output ?? input.result ?? '';\nconst rawText = typeof rawCandidate === 'string' ? rawCandidate : JSON.stringify(rawCandidate);\nconst stats = input.stats || {};\nconst runContext = input.runContext || {};\nconst promptFragments = input.promptFragments || {};\nlet report = null;\nlet parseOk = false;\nlet parseError = '';\n\nconst stripCodeFence = (text = '') => {\n  if (!text.trim().startsWith('```')) return text;\n  const lines = text.trim().split(/\\r?\\n/);\n  if (lines.length >= 2) {\n    if (/^```/i.test(lines[0])) {\n      lines.shift();\n    }\n    while (lines.length && /^```/i.test(lines[lines.length - 1].trim())) {\n      lines.pop();\n    }\n    const newline = String.fromCharCode(10);\n    return lines.join(newline).trim();\n  }\n  return text;\n};\n\nif (!rawText) {\n  parseError = 'LLM 返回为空，缺少 JSON 字符串';\n} else {\n  const candidates = [rawText, stripCodeFence(rawText)];\n  for (const candidate of candidates) {\n    if (!candidate || parseOk) continue;\n    try {\n      report = JSON.parse(candidate);\n      parseOk = true;\n    } catch (error) {\n      parseError = `${error.name || 'Error'}: ${error.message}`;\n    }\n  }\n}\n\nreturn [\n  {\n    json: {\n      rawText,\n      report,\n      parseOk,\n      parseError,\n      stats,\n      runContext,\n      generatedAt: input.generatedAt || new Date().toISOString(),\n      promptFragments,\n      attempt: (input.attempt || 0) + 1\n    }\n  }\n];"
+      },
+      "id": "1C1F1ED3-AD36-4DF5-9438-4B3A93F494EE",
+      "name": "Parse Teaching JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst report = input.report || {};\nconst meta = report.meta || {};\nconst timeframe = meta.timeframe || {};\nconst counts = meta.counts || {};\nconst globalTop = Array.isArray(report.globalTop) ? report.globalTop : [];\nconst domains = Array.isArray(report.domains) ? report.domains : [];\nconst glossary = Array.isArray(report.glossary) ? report.glossary : [];\n\nconst newline = String.fromCharCode(10);\n\nconst formatDate = (iso) => {\n  if (!iso) return '日期待定';\n  const date = new Date(iso);\n  return Number.isNaN(date.getTime()) ? iso : date.toISOString().slice(0, 10);\n};\n\nconst renderItem = (item, index) => {\n  const title = item.title || `未命名论文 ${index + 1}`;\n  const link = item.primaryLink || item.link || item.pdfUrl || null;\n  const titleLine = link ? `**${index + 1}. [${title}](${link})**` : `**${index + 1}. ${title}**`;\n  const authors = Array.isArray(item.authors) && item.authors.length ? `作者：${item.authors.join(', ')}` : null;\n  const published = item.publishedAt ? `发表于：${formatDate(item.publishedAt)}` : null;\n  const keywords = Array.isArray(item.keyKeywords) && item.keyKeywords.length ? `关键词：${item.keyKeywords.join('、')}` : null;\n  const summary = item.teachingSummary ? `- 课堂速记：${item.teachingSummary}` : null;\n  const whyItMatters = item.whyItMatters ? `- 为什么值得关心：${item.whyItMatters}` : null;\n  const impact = item.impactForBusiness ? `- 对业务的启示：${item.impactForBusiness}` : null;\n  const actions = Array.isArray(item.recommendedActions) && item.recommendedActions.length\n    ? `- 建议行动：${item.recommendedActions.join('；')}`\n    : null;\n  const links = Array.isArray(item.furtherLinks) && item.furtherLinks.length\n    ? `- 延伸阅读：${item.furtherLinks.map((url, idx) => `[参考${idx + 1}](${url})`).join('、')}`\n    : null;\n\n  const content = [\n    titleLine,\n    [authors, published, keywords].filter(Boolean).join(' ｜ '),\n    summary,\n    whyItMatters,\n    impact,\n    actions,\n    links\n  ].filter(Boolean);\n\n  return content.join(newline);\n};\n\nconst lines = [];\nlines.push('# 学术热点周报');\nlines.push('');\nlines.push(`覆盖时间：${formatDate(timeframe.from)} 至 ${formatDate(timeframe.to)}（过去 ${timeframe.windowDays || 7} 天）`);\nlines.push(`精选篇目：全站 ${counts.overall ?? '-'} 篇 ｜ 领域合计 ${counts.domain ?? '-'} 篇`);\nlines.push('');\n\nif (globalTop.length) {\n  lines.push('## 全站最热 Top 10');\n  globalTop.forEach((item, index) => {\n    lines.push(renderItem(item, index));\n    lines.push('');\n  });\n}\n\ndomains.forEach((group) => {\n  if (!Array.isArray(group.items) || !group.items.length) return;\n  lines.push(`## ${group.domainLabel || group.domainId || '重点领域'}`);\n  group.items.forEach((item, index) => {\n    lines.push(renderItem(item, index));\n    lines.push('');\n  });\n});\n\nif (glossary.length) {\n  lines.push('## 速查词汇');\n  glossary.forEach((entry) => {\n    if (!entry.term || !entry.definition) return;\n    lines.push(`- **${entry.term}**：${entry.definition}`);\n  });\n  lines.push('');\n}\n\nreturn [\n  {\n    json: {\n      markdown: lines.join(newline).trim(),\n      stats: {\n        overallTopCount: globalTop.length,\n        domainGroupCount: domains.length\n      }\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst report = input.report || {};\nconst meta = report.meta || {};\nconst timeframe = meta.timeframe || {};\nconst counts = meta.counts || {};\nconst globalTop = Array.isArray(report.globalTop) ? report.globalTop : [];\nconst domains = Array.isArray(report.domains) ? report.domains : [];\nconst glossary = Array.isArray(report.glossary) ? report.glossary : [];\n\nconst newline = String.fromCharCode(10);\n\nconst formatDate = (iso) => {\n  if (!iso) return '日期待定';\n  const date = new Date(iso);\n  return Number.isNaN(date.getTime()) ? iso : date.toISOString().slice(0, 10);\n};\n\nconst renderItem = (item, index) => {\n  const title = item.title || `未命名论文 ${index + 1}`;\n  const link = item.primaryLink || item.link || item.pdfUrl || null;\n  const titleLine = link ? `**${index + 1}. [${title}](${link})**` : `**${index + 1}. ${title}**`;\n  const authors = Array.isArray(item.authors) && item.authors.length ? `作者：${item.authors.join(', ')}` : null;\n  const published = item.publishedAt ? `发表于：${formatDate(item.publishedAt)}` : null;\n  const keywords = Array.isArray(item.keyKeywords) && item.keyKeywords.length ? `关键词：${item.keyKeywords.join('、')}` : null;\n  const summary = item.teachingSummary ? `- 课堂速记：${item.teachingSummary}` : null;\n  const whyItMatters = item.whyItMatters ? `- 为什么值得关心：${item.whyItMatters}` : null;\n  const impact = item.impactForBusiness ? `- 对业务的启示：${item.impactForBusiness}` : null;\n  const actions = Array.isArray(item.recommendedActions) && item.recommendedActions.length\n    ? `- 建议行动：${item.recommendedActions.join('；')}`\n    : null;\n  const links = Array.isArray(item.furtherLinks) && item.furtherLinks.length\n    ? `- 延伸阅读：${item.furtherLinks.map((url, idx) => `[参考${idx + 1}](${url})`).join('、')}`\n    : null;\n\n  const content = [\n    titleLine,\n    [authors, published, keywords].filter(Boolean).join(' ｜ '),\n    summary,\n    whyItMatters,\n    impact,\n    actions,\n    links\n  ].filter(Boolean);\n\n  return content.join(newline);\n};\n\nconst lines = [];\nlines.push('# 学术热点周报');\nlines.push('');\nlines.push(`覆盖时间：${formatDate(timeframe.from)} 至 ${formatDate(timeframe.to)}（过去 ${timeframe.windowDays || 7} 天）`);\nlines.push(`精选篇目：全站 ${counts.overall ?? '-'} 篇 ｜ 领域合计 ${counts.domain ?? '-'} 篇`);\nlines.push('');\n\nif (globalTop.length) {\n  lines.push('## 全站最热 Top 10');\n  globalTop.forEach((item, index) => {\n    lines.push(renderItem(item, index));\n    lines.push('');\n  });\n}\n\ndomains.forEach((group) => {\n  if (!Array.isArray(group.items) || !group.items.length) return;\n  lines.push(`## ${group.domainLabel || group.domainId || '重点领域'}`);\n  group.items.forEach((item, index) => {\n    lines.push(renderItem(item, index));\n    lines.push('');\n  });\n});\n\nif (glossary.length) {\n  lines.push('## 速查词汇');\n  glossary.forEach((entry) => {\n    if (!entry.term || !entry.definition) return;\n    lines.push(`- **${entry.term}**：${entry.definition}`);\n  });\n  lines.push('');\n}\n\nreturn [\n  {\n    json: {\n      markdown: lines.join(newline).trim(),\n      stats: {\n        overallTopCount: globalTop.length,\n        domainGroupCount: domains.length\n      }\n    }\n  }\n];"
+      },
+      "id": "AE1A0B92-15D8-4678-A9A3-6A512C985C38",
+      "name": "Prepare Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst stats = input.stats || {};\nconst timestamp = new Date();\nconst year = timestamp.getFullYear();\nconst month = String(timestamp.getMonth() + 1).padStart(2, '0');\nconst day = String(timestamp.getDate()).padStart(2, '0');\nconst fileName = `${year}${month}${day}-academic-research-weekly.md`;\nconst folderPath = '/academic-weekly-intel';\nconst filePath = `${folderPath}/${fileName}`;\n\nreturn [\n  {\n    json: {\n      markdown: input.markdown,\n      stats,\n      fileName,\n      folderPath,\n      filePath,\n      generatedAt: timestamp.toISOString()\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst stats = input.stats || {};\nconst timestamp = new Date();\nconst year = timestamp.getFullYear();\nconst month = String(timestamp.getMonth() + 1).padStart(2, '0');\nconst day = String(timestamp.getDate()).padStart(2, '0');\nconst fileName = `${year}${month}${day}-academic-research-weekly.md`;\nconst folderPath = '/academic-weekly-intel';\nconst filePath = `${folderPath}/${fileName}`;\n\nreturn [\n  {\n    json: {\n      markdown: input.markdown,\n      stats,\n      fileName,\n      folderPath,\n      filePath,\n      generatedAt: timestamp.toISOString()\n    }\n  }\n];"
+      },
+      "id": "0BF5377A-8A3F-4D77-BB2B-4EA1B4883C8F",
+      "name": "Prepare Dropbox Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nlet markdown = input.markdown ?? '';\nif (typeof markdown !== 'string') {\n  markdown = JSON.stringify(markdown);\n}\nconst buffer = Buffer.from(markdown, 'utf8');\nreturn [\n  {\n    json: {\n      fileName: input.fileName,\n      folderPath: input.folderPath,\n      filePath: input.filePath,\n      generatedAt: input.generatedAt,\n      stats: input.stats || {}\n    },\n    binary: {\n      data: {\n        data: buffer.toString('base64'),\n        mimeType: 'text/markdown',\n        fileName: input.fileName\n      }\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nlet markdown = input.markdown ?? '';\nif (typeof markdown !== 'string') {\n  markdown = JSON.stringify(markdown);\n}\nconst buffer = Buffer.from(markdown, 'utf8');\nreturn [\n  {\n    json: {\n      fileName: input.fileName,\n      folderPath: input.folderPath,\n      filePath: input.filePath,\n      generatedAt: input.generatedAt,\n      stats: input.stats || {}\n    },\n    binary: {\n      data: {\n        data: buffer.toString('base64'),\n        mimeType: 'text/markdown',\n        fileName: input.fileName\n      }\n    }\n  }\n];"
+      },
+      "id": "8F5A0A6D-5F18-4757-AB0D-55E3A78E6A5D",
+      "name": "Markdown to Binary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "path": "={{$json.filePath}}",
+        "binaryData": true,
+        "authentication": "oAuth2"
+      },
+      "id": "409E4510-A001-457C-9AA1-D3BCF255EA10",
+      "name": "Upload to Dropbox",
+      "type": "n8n-nodes-base.dropbox",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        48
+      ],
+      "credentials": {
+        "dropboxOAuth2Api": {
+          "id": "LooheV5upmL5rcGw",
+          "name": "Dropbox account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "61E2D32F-12B8-4E87-B082-D21459E7D472",
+      "name": "OpenRouter Gemini 2.5 Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -96
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "XV1sqh2GdIy4Daz1",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron - Tuesday 07:00": {
+      "main": [
+        [
+          {
+            "node": "Set Run Context (Cron)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Run Context (Cron)": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Manual Run": {
+      "main": [
+        [
+          {
+            "node": "Set Run Context (Webhook)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Run Context (Webhook)": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Triggers": {
+      "main": [
+        [
+          {
+            "node": "Keyword Registry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Registry": {
+      "main": [
+        [
+          {
+            "node": "Build Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Sources": {
+      "main": [
+        [
+          {
+            "node": "Fetch Papers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Papers": {
+      "main": [
+        [
+          {
+            "node": "Score & Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score & Split": {
+      "main": [
+        [
+          {
+            "node": "Prepare Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Prompt": {
+      "main": [
+        [
+          {
+            "node": "Summarize Papers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Papers": {
+      "main": [
+        [
+          {
+            "node": "Parse Teaching JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Teaching JSON": {
+      "main": [
+        [
+          {
+            "node": "Prepare Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Markdown": {
+      "main": [
+        [
+          {
+            "node": "Prepare Dropbox Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Dropbox Payload": {
+      "main": [
+        [
+          {
+            "node": "Markdown to Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown to Binary": {
+      "main": [
+        [
+          {
+            "node": "Upload to Dropbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Gemini 2.5 Flash": {
+      "main": [
+        []
+      ],
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarize Papers",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Shanghai"
+  },
+  "pinData": {},
+  "meta": {},
+  "tags": []
+}
