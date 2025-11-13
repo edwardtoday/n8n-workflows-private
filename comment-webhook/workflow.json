@@ -945,7 +945,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=你将收到一个 JSON 数组 commits。请对每个元素的 header 进行评分，score 只能是 0、1 或 2。\\n\\n评分规则：\\n- 2 分：格式合规（Conventional Commits：type[(scope)]!?: subject），且内容清晰可见，且单一意图。\\n- 1 分：满足以下任一：格式合规但内容不清晰；或内容清晰但格式不合规；或基本到位但可能包含多意图（轻度）。\\n- 0 分：格式不合规且内容不清晰。\\n\\n格式合规判定要点：type ∈ {feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert}；可选 (scope) 与 !；冒号后必须有一个空格；subject 非空。\\n内容清晰：subject 能独立表达变更意图，避免“update/调整/优化/修复问题/小修改/完善/修改代码/改动/misc”等空泛词。\\n单一意图：subject 不应并列多个动作（and/与/及/并且/同时/；/；多个动词并列等）。\\n\\n仅输出严格的 JSON 数组，不要任何多余文本或 Markdown。每个元素形如：{\\\"commit_id\\\":string,\\\"header\\\":string,\\\"score\\\":number,\\\"reason\\\":string}。\\n\\ncommits: {{ $json.commits.toJsonString() }}"
+        "text": "=你将收到 commits 数组（每项含 commit_id 与 header）和项目 URL。请直接输出最终评论（GitLab Markdown），严格遵循：\n1) 第一行只写：总分：X（X 只能是 0/1/2；规则：若存在任意 0→总分0；若全部为2→总分2；否则1）\n2) 接着一段“总体建议”：给出3–5条改进建议\n3) 然后输出表格，表头固定：commit link | log | ai评价；每行三列\n4) commit link 优先用 {{ $('Webhook').first().json.body.project.web_url }}/-/commit/{sha}；若无 URL 则用 {sha}\n5) 输出必须为 Markdown，不要解释性文字，不要包裹代码块\n\n评分标准：\n- 2：格式合规（Conventional Commits：type[(scope)]!?: subject），且内容清晰，且单一意图\n- 1：格式合规但内容不清晰；或内容清晰但格式不合规；或可能多意图（轻度）\n- 0：格式不合规且内容不清晰\n\ncommits: {{ $json.commits.toJsonString() }}\n\nproject_web_url: {{ $('Webhook').first().json.body.project.web_url }}\n"
       },
       "id": "b624567c-2017-464c-aff6-4eef6353815e",
       "name": "Commit Lint LLM Chain (MR)",
@@ -1182,7 +1182,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=你将收到一个 JSON 数组 commits。请对每个元素的 header 进行评分，score 只能是 0、1 或 2。\\n\\n评分规则：\\n- 2 分：格式合规（Conventional Commits：type[(scope)]!?: subject），且内容清晰可见，且单一意图。\\n- 1 分：满足以下任一：格式合规但内容不清晰；或内容清晰但格式不合规；或基本到位但可能包含多意图（轻度）。\\n- 0 分：格式不合规且内容不清晰。\\n\\n格式合规判定要点：type ∈ {feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert}；可选 (scope) 与 !；冒号后必须有一个空格；subject 非空。\\n内容清晰：subject 能独立表达变更意图，避免“update/调整/优化/修复问题/小修改/完善/修改代码/改动/misc”等空泛词。\\n单一意图：subject 不应并列多个动作（and/与/及/并且/同时/；/；多个动词并列等）。\\n\\n仅输出严格的 JSON 数组，不要任何多余文本或 Markdown。每个元素形如：{\\\"commit_id\\\":string,\\\"header\\\":string,\\\"score\\\":number,\\\"reason\\\":string}。\\n\\ncommits: {{ $json.commits.toJsonString() }}"
+        "text": "=你将收到 commits 数组（每项含 commit_id 与 header）和项目 URL。请直接输出最终评论（GitLab Markdown），严格遵循：\n1) 第一行只写：总分：X（X 只能是 0/1/2；规则：若存在任意 0→总分0；若全部为2→总分2；否则1）\n2) 接着一段“总体建议”：给出3–5条改进建议\n3) 然后输出表格，表头固定：commit link | log | ai评价；每行三列\n4) commit link 优先用 {{ $('Webhook').first().json.body.project.web_url }}/-/commit/{sha}；若无 URL 则用 {sha}\n5) 输出必须为 Markdown，不要解释性文字，不要包裹代码块\n\n评分标准：\n- 2：格式合规（Conventional Commits：type[(scope)]!?: subject），且内容清晰，且单一意图\n- 1：格式合规但内容不清晰；或内容清晰但格式不合规；或可能多意图（轻度）\n- 0：格式不合规且内容不清晰\n\ncommits: {{ $json.commits.toJsonString() }}\n\nproject_web_url: {{ $('Webhook').first().json.body.project.web_url }}\n"
       },
       "id": "a0320535-087c-4b07-a0b7-59db99aa429d",
       "name": "Commit Lint LLM Chain (Issue)",
@@ -1453,6 +1453,34 @@
         1200
       ],
       "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const t = ($json.text||'').toString();\nconst first = t.split('\\n')[0].trim();\nif(!/^总分：(0|1|2)$/.test(first)){ return { text: '总分：1\\n\\n' + t }; }\nreturn { text: t };"
+      },
+      "id": "8b704f17-0ecf-4c4b-b508-ed2ca046642b",
+      "name": "Guard Lint Output (MR)",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        80,
+        740
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const t = ($json.text||'').toString();\nconst first = t.split('\\n')[0].trim();\nif(!/^总分：(0|1|2)$/.test(first)){ return { text: '总分：1\\n\\n' + t }; }\nreturn { text: t };"
+      },
+      "id": "d0361ff1-3eda-4166-b15a-2f56e43d3ca2",
+      "name": "Guard Lint Output (Issue)",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        80,
+        1080
+      ],
+      "typeVersion": 2
     }
   ],
   "connections": {
@@ -1797,7 +1825,7 @@
       "main": [
         [
           {
-            "node": "Merge MR lint context",
+            "node": "Guard Lint Output (MR)",
             "type": "main",
             "index": 0
           }
@@ -1817,24 +1845,12 @@
     },
     "Merge MR lint context": {
       "main": [
-        [
-          {
-            "node": "Format Lint Output (MR)",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Format Lint Output (MR)": {
       "main": [
-        [
-          {
-            "node": "Has MR discussion id",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "commit-lint on Issue": {
@@ -1901,7 +1917,7 @@
       "main": [
         [
           {
-            "node": "Merge Issue lint context",
+            "node": "Guard Lint Output (Issue)",
             "type": "main",
             "index": 0
           }
@@ -1921,24 +1937,12 @@
     },
     "Merge Issue lint context": {
       "main": [
-        [
-          {
-            "node": "Format Lint Output (Issue)",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Format Lint Output (Issue)": {
       "main": [
-        [
-          {
-            "node": "Has Issue discussion id",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Has MR discussion id": {
@@ -1971,6 +1975,28 @@
         [
           {
             "node": "Post Issue lint (new note)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guard Lint Output (MR)": {
+      "main": [
+        [
+          {
+            "node": "Has MR discussion id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guard Lint Output (Issue)": {
+      "main": [
+        [
+          {
+            "node": "Has Issue discussion id",
             "type": "main",
             "index": 0
           }
