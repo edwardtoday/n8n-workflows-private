@@ -1137,7 +1137,7 @@
               "id": "7645b287-bb87-470c-8239-07cdd20b3829",
               "name": "issue_iid",
               "type": "number",
-              "value": "={{ $('Webhook').first().json.body.object_attributes.iid }}"
+              "value": "={{ $('Webhook').first().json.body.issue.iid }}"
             },
             {
               "id": "de6614f8-b40a-468c-80b2-8e2f07b4d102",
