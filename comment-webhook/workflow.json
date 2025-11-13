@@ -1251,6 +1251,208 @@
         1080
       ],
       "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "61336c90-9433-4602-9c44-763c0a3f625d",
+              "leftValue": "={{ $json.discussion_id || '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "50189cb2-0e63-46ef-a428-a99ba78eab93",
+      "name": "Has MR discussion id",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        200,
+        700
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/merge_requests/{{ $json.mr_iid }}/discussions/{{ $json.discussion_id }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "glpat-SLKEZBWoWC3jqHLD5y2k"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e2d9afa8-d268-4243-b4d3-048701838282",
+      "name": "Post MR lint (reply)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        480,
+        660
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/merge_requests/{{ $json.mr_iid }}/discussions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "glpat-SLKEZBWoWC3jqHLD5y2k"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a69af491-ed06-486e-bfca-d3e4f1716801",
+      "name": "Post MR lint (new discussion)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        480,
+        820
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "e635db5b-5984-437b-9c71-cb88c8ed1519",
+              "leftValue": "={{ $json.discussion_id || '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d55eac03-0533-45f4-839f-e9f1d32b096c",
+      "name": "Has Issue discussion id",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        440,
+        1080
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/issues/{{ $json.issue_iid }}/discussions/{{ $json.discussion_id }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "glpat-SLKEZBWoWC3jqHLD5y2k"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d7e44832-0a3c-42b0-92c1-aab1271c54c5",
+      "name": "Post Issue lint (reply)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        720,
+        1040
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/issues/{{ $json.issue_iid }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "glpat-SLKEZBWoWC3jqHLD5y2k"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a3b9bb8c-ebf3-4f34-9e73-c14973215cf7",
+      "name": "Post Issue lint (new note)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        720,
+        1200
+      ],
+      "typeVersion": 4.2
     }
   ],
   "connections": {
@@ -1628,7 +1830,7 @@
       "main": [
         [
           {
-            "node": "Post MR lint result",
+            "node": "Has MR discussion id",
             "type": "main",
             "index": 0
           }
@@ -1732,7 +1934,43 @@
       "main": [
         [
           {
-            "node": "Post Issue lint result",
+            "node": "Has Issue discussion id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has MR discussion id": {
+      "main": [
+        [
+          {
+            "node": "Post MR lint (reply)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post MR lint (new discussion)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Issue discussion id": {
+      "main": [
+        [
+          {
+            "node": "Post Issue lint (reply)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post Issue lint (new note)",
             "type": "main",
             "index": 0
           }
