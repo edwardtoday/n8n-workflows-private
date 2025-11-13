@@ -1604,13 +1604,13 @@
           },
           "conditions": [
             {
-              "id": "485d1018-c37e-4631-ab82-79a3dd7a5e56",
-              "leftValue": "={{ !!$json.text }}",
+              "id": "has-text",
+              "leftValue": "={{ $json.text || '' }}",
+              "rightValue": "",
               "operator": {
-                "type": "boolean",
-                "operation": "true"
-              },
-              "rightValue": ""
+                "type": "string",
+                "operation": "notEquals"
+              }
             }
           ],
           "combinator": "and"
