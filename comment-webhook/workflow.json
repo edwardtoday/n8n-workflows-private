@@ -1481,6 +1481,150 @@
         1080
       ],
       "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $('Webhook').first().json.body.project_id }}/issues/{{ $('Webhook').first().json.body.issue.iid }}/notes?per_page=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "glpat-SLKEZBWoWC3jqHLD5y2k"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "13f243cd-c0d7-4b5c-ac94-b5323b10bd2a",
+      "name": "Get Issue notes",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -960,
+        1160
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const set=new Set(); for(const it of $input.all()){ const b=(it.json.body||'')+''; const m=[...b.matchAll(/merge request\\s*!([0-9]+)/ig)]; for(const x of m){ set.add(x[1]); } } return Array.from(set).map(i=>({mr_iid:i}));"
+      },
+      "id": "80b1f10e-4f87-44a9-a888-e688f0b7b029",
+      "name": "Extract MR from notes",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -760,
+        1160
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $('Webhook').first().json.body.project_id }}/merge_requests/{{ $json.mr_iid }}/commits",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "glpat-SLKEZBWoWC3jqHLD5y2k"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d139b3ca-d266-45d9-ae1d-cf78444f8d71",
+      "name": "Get MR commits (from notes)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -560,
+        1160
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const MAX=50; const set=new Set(); for(const it of $input.all()){ const b=(it.json.body||'')+''; const m=[...b.matchAll(/mentioned in commit\\s+([0-9a-f]{7,40})/ig)]; for(const x of m){ set.add(x[1]); } } return Array.from(set).slice(0,MAX).map(sha=>({sha}));"
+      },
+      "id": "194c4f29-7a91-4fd3-9445-c8412b6f9158",
+      "name": "Extract commit shas from notes",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -760,
+        1240
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $('Webhook').first().json.body.project_id }}/repository/commits/{{ $json.sha }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "glpat-SLKEZBWoWC3jqHLD5y2k"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fe35418d-b09b-44f2-a7cf-e3f7631b3af1",
+      "name": "Get commit detail (sha)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -560,
+        1240
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const commits = Array.isArray($json.commits)?$json.commits:[]; if (commits.length===0){ const lines=[]; lines.push('总分：1'); lines.push(''); lines.push('总体建议：'); lines.push('- 使用约定式提交头部：type(scope): subject'); lines.push('- subject 要具体，避免“update/调整/优化/修复问题/小修改/完善/修改代码/改动/misc”等空泛词'); lines.push('- 单 commit 单意图，避免并列描述'); lines.push(''); lines.push('| commit link | log | ai评价 |'); lines.push('| --- | --- | --- |'); lines.push('| 无 | 无 | 无关联提交 |'); return { text: lines.join('\\n') }; } return $json;"
+      },
+      "id": "aaaeb3dc-62da-4d60-8c7c-5152a0ad2745",
+      "name": "Issue Fallback Prepare",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -360,
+        1040
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "485d1018-c37e-4631-ab82-79a3dd7a5e56",
+              "leftValue": "={{ !!$json.text }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4589ddc0-e721-44b0-80cc-970396e8c239",
+      "name": "Issue has text?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -80,
+        1040
+      ],
+      "typeVersion": 2.2
     }
   ],
   "connections": {
@@ -1865,6 +2009,11 @@
             "node": "Set Issue context (lint)",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Get Issue notes",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -1906,7 +2055,7 @@
       "main": [
         [
           {
-            "node": "Commit Lint LLM Chain (Issue)",
+            "node": "Issue Fallback Prepare",
             "type": "main",
             "index": 0
           }
@@ -1997,6 +2146,95 @@
         [
           {
             "node": "Has Issue discussion id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Issue notes": {
+      "main": [
+        [
+          {
+            "node": "Extract MR from notes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract commit shas from notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract MR from notes": {
+      "main": [
+        [
+          {
+            "node": "Get MR commits (from notes)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract commit shas from notes": {
+      "main": [
+        [
+          {
+            "node": "Get commit detail (sha)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get MR commits (from notes)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Issue commits (lint)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get commit detail (sha)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Issue commits (lint)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issue Fallback Prepare": {
+      "main": [
+        [
+          {
+            "node": "Issue has text?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issue has text?": {
+      "main": [
+        [
+          {
+            "node": "Guard Lint Output (Issue)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Commit Lint LLM Chain (Issue)",
             "type": "main",
             "index": 0
           }
