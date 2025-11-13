@@ -1263,8 +1263,8 @@
           },
           "conditions": [
             {
-              "id": "61336c90-9433-4602-9c44-763c0a3f625d",
-              "leftValue": "={{ $json.discussion_id || '' }}",
+              "id": "disc-mr",
+              "leftValue": "={{ $('Webhook').first().json.body.object_attributes.discussion_id || '' }}",
               "rightValue": "",
               "operator": {
                 "type": "string",
@@ -1288,7 +1288,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/merge_requests/{{ $json.mr_iid }}/discussions/{{ $json.discussion_id }}/notes",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $('Webhook').first().json.body.project_id }}/merge_requests/{{ $('Webhook').first().json.body.merge_request.iid }}/discussions/{{ $('Webhook').first().json.body.object_attributes.discussion_id }}/notes",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -1322,7 +1322,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/merge_requests/{{ $json.mr_iid }}/discussions",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $('Webhook').first().json.body.project_id }}/merge_requests/{{ $('Webhook').first().json.body.merge_request.iid }}/discussions",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -1364,8 +1364,8 @@
           },
           "conditions": [
             {
-              "id": "e635db5b-5984-437b-9c71-cb88c8ed1519",
-              "leftValue": "={{ $json.discussion_id || '' }}",
+              "id": "disc-issue",
+              "leftValue": "={{ $('Webhook').first().json.body.object_attributes.discussion_id || '' }}",
               "rightValue": "",
               "operator": {
                 "type": "string",
@@ -1389,7 +1389,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/issues/{{ $json.issue_iid }}/discussions/{{ $json.discussion_id }}/notes",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $('Webhook').first().json.body.project_id }}/issues/{{ $('Webhook').first().json.body.issue.iid }}/discussions/{{ $('Webhook').first().json.body.object_attributes.discussion_id }}/notes",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -1423,7 +1423,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $json.project_id }}/issues/{{ $json.issue_iid }}/notes",
+        "url": "=https://git.sansi.net:6101/api/v4/projects/{{ $('Webhook').first().json.body.project_id }}/issues/{{ $('Webhook').first().json.body.issue.iid }}/notes",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
