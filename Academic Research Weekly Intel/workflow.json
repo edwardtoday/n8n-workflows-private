@@ -205,7 +205,7 @@
       "parameters": {
         "promptType": "define",
         "text": "={{$json.prompt}}",
-        "model": "google/gemini-2.5-flash"
+        "model": "google/gemini-3-flash-preview"
       },
       "id": "52A64F35-1F0D-4A5D-9BF1-888DD0B902D4",
       "name": "Summarize Papers",
@@ -303,7 +303,7 @@
     },
     {
       "parameters": {
-        "model": "google/gemini-2.5-flash",
+        "model": "google/gemini-3-flash-preview",
         "options": {
           "temperature": 0.2
         }

@@ -778,7 +778,7 @@
     },
     {
       "parameters": {
-        "model": "google/gemini-2.5-pro",
+        "model": "google/gemini-3-pro-preview",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
@@ -918,7 +918,7 @@
     },
     {
       "parameters": {
-        "model": "google/gemini-2.5-pro",
+        "model": "google/gemini-3-pro-preview",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
@@ -1106,7 +1106,7 @@
     },
     {
       "parameters": {
-        "model": "google/gemini-2.5-pro",
+        "model": "google/gemini-3-pro-preview",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
