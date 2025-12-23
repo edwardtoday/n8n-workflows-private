@@ -32,6 +32,12 @@
   `https://ai.google/research/`  
   - 抓取方式：从页面中提取 `blog.google/technology/*` 与 `research.google/blog/*` 的精选链接，再逐条抓取文章页 `og:title / og:description / article:published_time`（并尝试 JSON-LD `datePublished`/`author` 兜底）。  
 
+- **OpenReview（Archive Direct Upload）**  
+  `https://openreview.net/`（数据接口：`https://api2.openreview.net/notes?invitation=OpenReview.net/Archive/-/Direct_Upload`）  
+  - 抓取方式：按 `tcdate` 倒序分页抓取最近条目，并用 `mintcdate`（=抓取窗口起始时间）做近 7 天过滤。  
+  - 去噪策略：仅保留标题/摘要/venue 命中 AI/ML/代码相关关键词的条目，避免“非技术领域论文”刷屏（命中与否会记录在 diagnostics）。  
+  - 字段映射：`title/authors/abstract/venue/pdf/html` → 统一字段；详情链接使用 `https://openreview.net/forum?id=<note_id>`。  
+
 ## 2. 重点领域信源（去重后合计取 10 篇）
 
 | 领域 | 数据源与示例查询 | 说明 |
