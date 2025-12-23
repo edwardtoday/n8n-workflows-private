@@ -23,6 +23,15 @@
   `https://huggingface.co/api/papers?sort=trending&limit=50`  
   - 覆盖机器学习/AI 热点；提供 `metrics.tweets`, `metrics.bookmarks` 等社交指标。
 
+- **Google Research Pubs（HTML 列表页）**  
+  `https://research.google/pubs/`  
+  - 抓取方式：解析列表页 `row-card` 卡片（标题/作者/摘要预览/详情链接）。  
+  - 时间字段：页面通常只展示年份，为避免误判“未来年份”且让其参与近 7 天评分，workflow 会用“列表顺序 + 本次抓取时间”生成 `publishedAt`（并在 `raw.publicationYear` 保留原始年份）。  
+
+- **Google AI Research（精选链接聚合）**  
+  `https://ai.google/research/`  
+  - 抓取方式：从页面中提取 `blog.google/technology/*` 与 `research.google/blog/*` 的精选链接，再逐条抓取文章页 `og:title / og:description / article:published_time`（并尝试 JSON-LD `datePublished`/`author` 兜底）。  
+
 ## 2. 重点领域信源（去重后合计取 10 篇）
 
 | 领域 | 数据源与示例查询 | 说明 |
