@@ -6,6 +6,16 @@ _Last refreshed: 2025-10-23 13:45Z. Status reflects the post-fix workflow (execu
 
 ### Global / English
 
+- [LED professional](https://www.led-professional.com/RSS) — LED lighting, components, packaging, and application engineering news (Atom).
+  - Why it matters: Complements LEDinside/MicroLED-Info with a lighting-engineering oriented viewpoint and vendor ecosystem updates.
+- [darc magazine](http://www.darcmagazine.com/feed/) — Architectural / entertainment lighting design projects and product news.
+  - Why it matters: Adds project-side signals (design trends, fixture/control requirements) useful for integration opportunities.
+- [Broadsign](https://broadsign.com/rss.xml) — DOOH / digital signage platform updates (software, ecosystem, deployments).
+  - Why it matters: Captures platform and operational trends affecting signage integration and software requirements.
+- [Yodeck](https://www.yodeck.com/feed/) — Digital signage SaaS product updates and case studies.
+  - Why it matters: Provides signals on signage feature trends and commercial deployments (vendor-driven, keep weight moderate).
+- [Screenly](https://www.screenly.io/rss.xml) — Digital signage software updates and deployment topics.
+  - Why it matters: Adds software-side trends for content management, device management, and signage operations.
 - [MicroLED-Info](https://www.microled-info.com/rss.xml) — MicroLED and mini-LED R&D, product launches, supply chain movements.
   - Verification: HTTP 200 · `application/rss+xml; charset=utf-8`
   - Why it matters: Deep coverage on microLED breakthroughs, manufacturing partnerships, and patent activity relevant to high-end displays.
@@ -39,6 +49,9 @@ _Last refreshed: 2025-10-23 13:45Z. Status reflects the post-fix workflow (execu
 - [LightNOW Blog](https://www.lightnowblog.com/feed/) — Lighting design, standards, and energy policy analysis.
   - Verification: HTTP 200 · `application/rss+xml; charset=UTF-8`
   - Why it matters: Explains code changes, advanced lighting controls, and efficacy benchmarks that influence product specs.
+- [Lux Review](https://www.luxreview.com/feed/) — Lighting industry news, projects, and product updates.
+  - Verification: HTTP 200 · `application/rss+xml; charset=UTF-8`
+  - Why it matters: Adds additional coverage on European lighting design, controls, and specification trends.
 - [Illuminating Engineering Society (IES)](https://www.ies.org/feed/) — Lighting practice updates, standards development, and technical insights.
   - Verification: HTTP 200 · `application/rss+xml; charset=UTF-8`
   - Why it matters: Authoritative source on codes, recommended practices, and committee work shaping compliance requirements.

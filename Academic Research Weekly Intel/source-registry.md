@@ -38,6 +38,13 @@
   - 去噪策略：仅保留标题/摘要/venue 命中 AI/ML/代码相关关键词的条目，避免“非技术领域论文”刷屏（命中与否会记录在 diagnostics）。  
   - 字段映射：`title/authors/abstract/venue/pdf/html` → 统一字段；详情链接使用 `https://openreview.net/forum?id=<note_id>`。  
 
+- **RSS（补充：只保留标题/摘要命中 AI 关键词的条目）**
+  - medRxiv：`https://www.medrxiv.org/rss.xml`（健康/医疗领域预印本，用于捕捉“AI+医疗/健康/养老”相关论文与综述）
+  - Nature：`https://www.nature.com/nature.rss`（综合期刊新闻/论文条目，作为“高影响力候选”的补充信号）
+  - Nature / Machine learning：`https://www.nature.com/subjects/machine-learning.rss`（机器学习主题聚合）
+  - Frontiers in AI：`https://www.frontiersin.org/journals/artificial-intelligence/rss`（AI 期刊条目）
+  - EdSurge：`https://www.edsurge.com/rss`（教育科技新闻/研究解读，用于捕捉“AI+教育”方向）
+
 ## 2. 重点领域信源（去重后合计取 10 篇）
 
 | 领域 | 数据源与示例查询 | 说明 |
