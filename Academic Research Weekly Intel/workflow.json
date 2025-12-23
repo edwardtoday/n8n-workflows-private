@@ -341,49 +341,29 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = items[0]?.json || {};\n\n// 将周报 HTML 组装为 Gmail API 需要的 base64url(raw mime)\nconst html = String(input.emailHtml || '');\nconst to = 'edwardtoday@gmail.com';\nconst bcc = '';\n\nconst date = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' });\nconst subject = `${date} Academic Research Weekly Intel`;\n\nconst headers = [\n  `To: ${to}`,\n  bcc ? `Bcc: ${bcc}` : null,\n  `Subject: ${subject}`,\n  'MIME-Version: 1.0',\n  'Content-Type: text/html; charset=\"UTF-8\"'\n].filter(Boolean);\n\nconst rawMime = `${headers.join('\\r\\n')}\\r\\n\\r\\n${html}`;\nconst gmailRaw = Buffer.from(rawMime, 'utf8')\n  .toString('base64')\n  .replace(/\\+/g, '-')\n  .replace(/\\//g, '_')\n  .replace(/=+$/g, '');\n\nreturn [{\n  json: {\n    ...input,\n    emailTo: to,\n    emailBcc: bcc,\n    emailSubject: subject,\n    gmailRaw\n  }\n}];",
-        "functionCode": "const input = items[0]?.json || {};\n\n// 将周报 HTML 组装为 Gmail API 需要的 base64url(raw mime)\nconst html = String(input.emailHtml || '');\nconst to = 'edwardtoday@gmail.com';\nconst bcc = '';\n\nconst date = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' });\nconst subject = `${date} Academic Research Weekly Intel`;\n\nconst headers = [\n  `To: ${to}`,\n  bcc ? `Bcc: ${bcc}` : null,\n  `Subject: ${subject}`,\n  'MIME-Version: 1.0',\n  'Content-Type: text/html; charset=\"UTF-8\"'\n].filter(Boolean);\n\nconst rawMime = `${headers.join('\\r\\n')}\\r\\n\\r\\n${html}`;\nconst gmailRaw = Buffer.from(rawMime, 'utf8')\n  .toString('base64')\n  .replace(/\\+/g, '-')\n  .replace(/\\//g, '_')\n  .replace(/=+$/g, '');\n\nreturn [{\n  json: {\n    ...input,\n    emailTo: to,\n    emailBcc: bcc,\n    emailSubject: subject,\n    gmailRaw\n  }\n}];"
+        "operation": "send",
+        "fromEmail": "edwardtoday@gmail.com",
+        "toEmail": "edwardtoday@gmail.com",
+        "subject": "={{ $now.toISODate() + \" Academic Research Weekly Intel\" }}",
+        "emailFormat": "html",
+        "html": "={{ $json.emailHtml }}",
+        "options": {
+          "appendAttribution": false,
+          "bccEmail": ""
+        }
       },
-      "id": "B2007B85-9C7B-4B57-8D75-3F06B15D8362",
-      "name": "Build Gmail Raw (Email)",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "A9B49C3A-4004-4F4A-85A8-DA9D9C0B7C08",
+      "name": "Send Weekly Email (SMTP)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [
         1232,
-        144
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleOAuth2Api",
-        "sendBody": true,
-        "contentType": "json",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "raw",
-              "value": "={{ $json.gmailRaw }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "A0E3140F-5E08-40E0-81C2-43B73D015A69",
-      "name": "Send Weekly Email (Gmail API)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "continueOnFail": true,
-      "position": [
-        1456,
         288
       ],
       "credentials": {
-        "googleOAuth2Api": {
-          "id": "XDoMR3WRmUBI3yXj",
-          "name": "Google OAuth2 API"
+        "smtp": {
+          "id": "IDB1C8SE5aIIL6deXW",
+          "name": "SMTP"
         }
       }
     }
@@ -577,25 +557,14 @@
       "main": [
         [
           {
-            "node": "Build Gmail Raw (Email)",
+            "node": "Send Weekly Email (SMTP)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Build Gmail Raw (Email)": {
-      "main": [
-        [
-          {
-            "node": "Send Weekly Email (Gmail API)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send Weekly Email (Gmail API)": {
+    "Send Weekly Email (SMTP)": {
       "main": [
         []
       ]
