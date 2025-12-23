@@ -231,6 +231,34 @@
     },
     {
       "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst report = input.report || {};\n\nconst isHttpUrl = (value) => {\n  if (typeof value !== 'string') return false;\n  const trimmed = value.trim();\n  return /^https?:\\/\\//i.test(trimmed);\n};\n\nconst firstHttpUrl = (...candidates) => {\n  for (const candidate of candidates) {\n    if (!isHttpUrl(candidate)) continue;\n    return candidate.trim();\n  }\n  return '';\n};\n\nconst sanitizeSource = (source) => {\n  if (!source || typeof source !== 'object') return source;\n  const link = firstHttpUrl(source.link, source.url);\n  return {\n    ...source,\n    link: link || (typeof source.link === 'string' ? source.link : null),\n    url: link || (typeof source.url === 'string' ? source.url : null)\n  };\n};\n\nconst sanitizeItem = (item) => {\n  if (!item || typeof item !== 'object') return item;\n  const safeSource = sanitizeSource(item.source);\n  const resolvedLink = firstHttpUrl(\n    item.resolvedLink,\n    item.link,\n    item.url,\n    item.href,\n    safeSource?.link,\n    safeSource?.url,\n    item.sourceUrl,\n    item.feedUrl\n  );\n\n  const safe = {\n    ...item,\n    source: safeSource,\n    resolvedLink\n  };\n\n  if (safe.link !== undefined && !isHttpUrl(safe.link)) {\n    delete safe.link;\n  } else if (typeof safe.link === 'string') {\n    safe.link = safe.link.trim();\n  }\n\n  return safe;\n};\n\nconst sections = Array.isArray(report.sections) ? report.sections : [];\nconst newsIndex = Array.isArray(report.newsIndex) ? report.newsIndex : [];\n\nconst sanitizedSections = sections.map((section) => {\n  if (!section || typeof section !== 'object') return section;\n  const items = Array.isArray(section.items) ? section.items.map(sanitizeItem) : [];\n  return { ...section, items };\n});\n\nconst sanitizedNewsIndex = newsIndex.map(sanitizeItem);\n\nconst sanitizedReport = {\n  ...report,\n  sections: sanitizedSections,\n  newsIndex: sanitizedNewsIndex\n};\n\nreturn [\n  {\n    json: {\n      ...input,\n      report: sanitizedReport\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst report = input.report || {};\n\nconst isHttpUrl = (value) => {\n  if (typeof value !== 'string') return false;\n  const trimmed = value.trim();\n  return /^https?:\\/\\//i.test(trimmed);\n};\n\nconst firstHttpUrl = (...candidates) => {\n  for (const candidate of candidates) {\n    if (!isHttpUrl(candidate)) continue;\n    return candidate.trim();\n  }\n  return '';\n};\n\nconst sanitizeSource = (source) => {\n  if (!source || typeof source !== 'object') return source;\n  const link = firstHttpUrl(source.link, source.url);\n  return {\n    ...source,\n    link: link || (typeof source.link === 'string' ? source.link : null),\n    url: link || (typeof source.url === 'string' ? source.url : null)\n  };\n};\n\nconst sanitizeItem = (item) => {\n  if (!item || typeof item !== 'object') return item;\n  const safeSource = sanitizeSource(item.source);\n  const resolvedLink = firstHttpUrl(\n    item.resolvedLink,\n    item.link,\n    item.url,\n    item.href,\n    safeSource?.link,\n    safeSource?.url,\n    item.sourceUrl,\n    item.feedUrl\n  );\n\n  const safe = {\n    ...item,\n    source: safeSource,\n    resolvedLink\n  };\n\n  if (safe.link !== undefined && !isHttpUrl(safe.link)) {\n    delete safe.link;\n  } else if (typeof safe.link === 'string') {\n    safe.link = safe.link.trim();\n  }\n\n  return safe;\n};\n\nconst sections = Array.isArray(report.sections) ? report.sections : [];\nconst newsIndex = Array.isArray(report.newsIndex) ? report.newsIndex : [];\n\nconst sanitizedSections = sections.map((section) => {\n  if (!section || typeof section !== 'object') return section;\n  const items = Array.isArray(section.items) ? section.items.map(sanitizeItem) : [];\n  return { ...section, items };\n});\n\nconst sanitizedNewsIndex = newsIndex.map(sanitizeItem);\n\nconst sanitizedReport = {\n  ...report,\n  sections: sanitizedSections,\n  newsIndex: sanitizedNewsIndex\n};\n\nreturn [\n  {\n    json: {\n      ...input,\n      report: sanitizedReport\n    }\n  }\n];"
+      },
+      "id": "7E3928DB-E7E0-42D7-87EB-141CEF587F42",
+      "name": "Sanitize Report Links",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nlet markdown = input.markdown ?? '';\nif (typeof markdown !== 'string') {\n  markdown = String(markdown);\n}\n\nconst replacements = [\n  ['\\n  - 摘要：', '\\n    - 摘要：'],\n  ['\\n  - 关键数据：', '\\n    - 关键数据：'],\n  ['\\n  - 影响：', '\\n    - 影响：'],\n  ['\\n  - 建议：', '\\n    - 建议：']\n];\n\nfor (const [from, to] of replacements) {\n  markdown = markdown.split(from).join(to);\n}\n\nif (!markdown.includes('周报作者：卿培')) {\n  const footerLines = [\n    '周报作者：卿培',\n    '联系方式：edwardtoday@gmail.com',\n    '欢迎对信息源和分析方法提出改进建议。'\n  ];\n  markdown = markdown.trimEnd() + '\\n\\n' + footerLines.join('\\n');\n}\n\nreturn [\n  {\n    json: {\n      ...input,\n      markdown\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nlet markdown = input.markdown ?? '';\nif (typeof markdown !== 'string') {\n  markdown = String(markdown);\n}\n\nconst replacements = [\n  ['\\n  - 摘要：', '\\n    - 摘要：'],\n  ['\\n  - 关键数据：', '\\n    - 关键数据：'],\n  ['\\n  - 影响：', '\\n    - 影响：'],\n  ['\\n  - 建议：', '\\n    - 建议：']\n];\n\nfor (const [from, to] of replacements) {\n  markdown = markdown.split(from).join(to);\n}\n\nif (!markdown.includes('周报作者：卿培')) {\n  const footerLines = [\n    '周报作者：卿培',\n    '联系方式：edwardtoday@gmail.com',\n    '欢迎对信息源和分析方法提出改进建议。'\n  ];\n  markdown = markdown.trimEnd() + '\\n\\n' + footerLines.join('\\n');\n}\n\nreturn [\n  {\n    json: {\n      ...input,\n      markdown\n    }\n  }\n];"
+      },
+      "id": "8C2A5B99-E445-435C-B212-7C54E13AD9C0",
+      "name": "Postprocess Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        48
+      ]
+    },
+    {
+      "parameters": {
         "jsCode": "const input = items[0]?.json || {};\nconst stats = input.stats || {};\nconst runContext = input.runContext || {};\nconst timestamp = input.generatedAt ? new Date(input.generatedAt) : new Date();\n\nconst year = timestamp.getFullYear();\nconst month = String(timestamp.getMonth() + 1).padStart(2, '0');\nconst day = String(timestamp.getDate()).padStart(2, '0');\nconst fileName = `${year}${month}${day}-sansi-led-intel.md`;\nconst folderPath = `/sansi-led-weekly-intel`;\nconst filePath = `${folderPath}/${fileName}`;\n\nreturn [\n  {\n    json: {\n      markdown: input.markdown,\n      stats,\n      runContext,\n      generatedAt: input.generatedAt || timestamp.toISOString(),\n      fileName,\n      folderPath,\n      filePath\n    }\n  }\n];",
         "functionCode": "const input = items[0]?.json || {};\nconst stats = input.stats || {};\nconst runContext = input.runContext || {};\nconst timestamp = input.generatedAt ? new Date(input.generatedAt) : new Date();\n\nconst year = timestamp.getFullYear();\nconst month = String(timestamp.getMonth() + 1).padStart(2, '0');\nconst day = String(timestamp.getDate()).padStart(2, '0');\nconst fileName = `${year}${month}${day}-sansi-led-intel.md`;\nconst folderPath = `/sansi-led-weekly-intel`;\nconst filePath = `${folderPath}/${fileName}`;\n\nreturn [\n  {\n    json: {\n      markdown: input.markdown,\n      stats,\n      runContext,\n      generatedAt: input.generatedAt || timestamp.toISOString(),\n      fileName,\n      folderPath,\n      filePath\n    }\n  }\n];"
       },
@@ -584,6 +612,28 @@
       "main": [
         [
           {
+            "node": "Postprocess Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize Report Links": {
+      "main": [
+        [
+          {
+            "node": "Prepare Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postprocess Markdown": {
+      "main": [
+        [
+          {
             "node": "Set Storage Path",
             "type": "main",
             "index": 0
@@ -633,7 +683,7 @@
       "main": [
         [
           {
-            "node": "Prepare Markdown",
+            "node": "Sanitize Report Links",
             "type": "main",
             "index": 0
           }
@@ -673,7 +723,7 @@
       "main": [
         [
           {
-            "node": "Prepare Markdown",
+            "node": "Sanitize Report Links",
             "type": "main",
             "index": 0
           }

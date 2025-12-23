@@ -148,8 +148,22 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = items[0]?.json || {};\nconst { domains = [], timeframe, config = {}, runContext = {} } = input;\n\nconst arxivQueries = [];\nconst openAlexTargets = [];\nconst semanticTargets = [];\nconst huggingfaceTargets = [];\nconst interestDomains = ['software-dev', 'smart-hardware', 'led-lighting', 'led-display', 'image-processing', 'image-recognition', 'ai-general', 'nlp'];\n\nfor (const domain of domains) {\n  const baseWeight = domain.weight || 1;\n  const domainTags = Array.isArray(domain.labels) ? domain.labels : [];\n  const fallbackQuery = domain.queries?.[0] || '';\n\n  if (domain.id === 'global-top') {\n    arxivQueries.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'all:(ai OR \"machine learning\" OR \"deep learning\") AND submittedDate:[NOW-7DAY TO NOW]',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      maxResults: config.arxivMaxResults || 60\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'artificial intelligence',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      perPage: config.openAlexPerQuery || 40\n    });\n\n    huggingfaceTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      domainId: domain.id,\n      domainTags,\n      weight: 1.1,\n      limit: config.huggingFacePerQuery || 40\n    });\n  }\n\n  if (fallbackQuery) {\n    arxivQueries.push({\n      id: `${domain.id}-arxiv`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      maxResults: Math.min(config.arxivMaxResults || 60, domain.id === 'global-top' ? 60 : 45)\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-openalex`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      perPage: Math.min(config.openAlexPerQuery || 40, 40)\n    });\n\n    semanticTargets.push({\n      id: `${domain.id}-semantic`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      limit: Math.min(config.semanticPerQuery || 30, 30)\n    });\n  }\n}\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      arxivQueries,\n      openAlexTargets,\n      semanticTargets,\n      huggingfaceTargets\n    }\n  }\n];",
-        "functionCode": "const input = items[0]?.json || {};\nconst { domains = [], timeframe, config = {}, runContext = {} } = input;\n\nconst arxivQueries = [];\nconst openAlexTargets = [];\nconst semanticTargets = [];\nconst huggingfaceTargets = [];\nconst interestDomains = ['software-dev', 'smart-hardware', 'led-lighting', 'led-display', 'image-processing', 'image-recognition', 'ai-general', 'nlp'];\n\nfor (const domain of domains) {\n  const baseWeight = domain.weight || 1;\n  const domainTags = Array.isArray(domain.labels) ? domain.labels : [];\n  const fallbackQuery = domain.queries?.[0] || '';\n\n  if (domain.id === 'global-top') {\n    arxivQueries.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'all:(ai OR \"machine learning\" OR \"deep learning\") AND submittedDate:[NOW-7DAY TO NOW]',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      maxResults: config.arxivMaxResults || 60\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'artificial intelligence',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      perPage: config.openAlexPerQuery || 40\n    });\n\n    huggingfaceTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      domainId: domain.id,\n      domainTags,\n      weight: 1.1,\n      limit: config.huggingFacePerQuery || 40\n    });\n  }\n\n  if (fallbackQuery) {\n    arxivQueries.push({\n      id: `${domain.id}-arxiv`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      maxResults: Math.min(config.arxivMaxResults || 60, domain.id === 'global-top' ? 60 : 45)\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-openalex`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      perPage: Math.min(config.openAlexPerQuery || 40, 40)\n    });\n\n    semanticTargets.push({\n      id: `${domain.id}-semantic`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      limit: Math.min(config.semanticPerQuery || 30, 30)\n    });\n  }\n}\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      arxivQueries,\n      openAlexTargets,\n      semanticTargets,\n      huggingfaceTargets\n    }\n  }\n];"
+        "jsCode": "const input = items[0]?.json || {};\nconst domains = Array.isArray(input.domains) ? input.domains.slice() : [];\n\nconst ensureDomain = (domain) => {\n  if (!domain?.id) return;\n  if (domains.some((existing) => existing?.id === domain.id)) return;\n  domains.push(domain);\n};\n\nensureDomain({\n  id: 'education',\n  label: '教育 / 学习科学',\n  queries: [\n    '(education OR learning OR \"educational technology\" OR tutoring) AND (AI OR \"machine learning\" OR \"large language model\")',\n    '(student OR classroom OR curriculum) AND (LLM OR \"machine learning\")'\n  ],\n  labels: ['education', 'ai'],\n  weight: 1.05\n});\n\nensureDomain({\n  id: 'display-tech',\n  label: '显示技术（非 LED）',\n  queries: [\n    '(display OR microdisplay OR OLED OR LCD OR \"AR display\" OR \"VR display\") AND (AI OR \"machine learning\")',\n    '(image quality OR color calibration OR perception) AND (AI OR \"machine learning\")'\n  ],\n  labels: ['display', 'ai'],\n  weight: 1\n});\n\nensureDomain({\n  id: 'healthcare-ai',\n  label: '健康 / 医疗 AI',\n  queries: [\n    '(healthcare OR medicine OR clinical OR hospital) AND (AI OR \"machine learning\" OR \"deep learning\")',\n    '(medical imaging OR radiology OR pathology) AND (AI OR \"deep learning\")'\n  ],\n  labels: ['health', 'ai'],\n  weight: 1.05\n});\n\nensureDomain({\n  id: 'elderly-care',\n  label: '养老 / 适老化',\n  queries: [\n    '(aging OR elderly OR gerontology OR \"assisted living\" OR caregiver) AND (AI OR \"machine learning\")',\n    '(fall detection OR rehabilitation OR vital sign monitoring) AND (AI OR \"machine learning\")'\n  ],\n  labels: ['aging', 'health', 'ai'],\n  weight: 1.05\n});\n\nreturn [\n  {\n    json: {\n      ...input,\n      domains\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst domains = Array.isArray(input.domains) ? input.domains.slice() : [];\n\nconst ensureDomain = (domain) => {\n  if (!domain?.id) return;\n  if (domains.some((existing) => existing?.id === domain.id)) return;\n  domains.push(domain);\n};\n\nensureDomain({\n  id: 'education',\n  label: '教育 / 学习科学',\n  queries: [\n    '(education OR learning OR \"educational technology\" OR tutoring) AND (AI OR \"machine learning\" OR \"large language model\")',\n    '(student OR classroom OR curriculum) AND (LLM OR \"machine learning\")'\n  ],\n  labels: ['education', 'ai'],\n  weight: 1.05\n});\n\nensureDomain({\n  id: 'display-tech',\n  label: '显示技术（非 LED）',\n  queries: [\n    '(display OR microdisplay OR OLED OR LCD OR \"AR display\" OR \"VR display\") AND (AI OR \"machine learning\")',\n    '(image quality OR color calibration OR perception) AND (AI OR \"machine learning\")'\n  ],\n  labels: ['display', 'ai'],\n  weight: 1\n});\n\nensureDomain({\n  id: 'healthcare-ai',\n  label: '健康 / 医疗 AI',\n  queries: [\n    '(healthcare OR medicine OR clinical OR hospital) AND (AI OR \"machine learning\" OR \"deep learning\")',\n    '(medical imaging OR radiology OR pathology) AND (AI OR \"deep learning\")'\n  ],\n  labels: ['health', 'ai'],\n  weight: 1.05\n});\n\nensureDomain({\n  id: 'elderly-care',\n  label: '养老 / 适老化',\n  queries: [\n    '(aging OR elderly OR gerontology OR \"assisted living\" OR caregiver) AND (AI OR \"machine learning\")',\n    '(fall detection OR rehabilitation OR vital sign monitoring) AND (AI OR \"machine learning\")'\n  ],\n  labels: ['aging', 'health', 'ai'],\n  weight: 1.05\n});\n\nreturn [\n  {\n    json: {\n      ...input,\n      domains\n    }\n  }\n];"
+      },
+      "id": "30A33AA6-D50F-405C-832B-C50EED7C418C",
+      "name": "Extend Domains",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nconst { domains = [], timeframe, config = {}, runContext = {} } = input;\n\nconst arxivQueries = [];\nconst openAlexTargets = [];\nconst semanticTargets = [];\nconst huggingfaceTargets = [];\nconst interestDomains = ['education', 'display-tech', 'led-display', 'led-lighting', 'healthcare-ai', 'elderly-care', 'software-dev', 'smart-hardware', 'image-processing', 'image-recognition', 'ai-general', 'nlp'];\n\nfor (const domain of domains) {\n  const baseWeight = domain.weight || 1;\n  const domainTags = Array.isArray(domain.labels) ? domain.labels : [];\n  const fallbackQuery = domain.queries?.[0] || '';\n\n  if (domain.id === 'global-top') {\n    arxivQueries.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'all:(ai OR \"machine learning\" OR \"deep learning\") AND submittedDate:[NOW-7DAY TO NOW]',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      maxResults: config.arxivMaxResults || 60\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'artificial intelligence',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      perPage: config.openAlexPerQuery || 40\n    });\n\n    huggingfaceTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      domainId: domain.id,\n      domainTags,\n      weight: 1.1,\n      limit: config.huggingFacePerQuery || 40\n    });\n  }\n\n  if (fallbackQuery) {\n    arxivQueries.push({\n      id: `${domain.id}-arxiv`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      maxResults: Math.min(config.arxivMaxResults || 60, domain.id === 'global-top' ? 60 : 45)\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-openalex`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      perPage: Math.min(config.openAlexPerQuery || 40, 40)\n    });\n\n    semanticTargets.push({\n      id: `${domain.id}-semantic`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      limit: Math.min(config.semanticPerQuery || 30, 30)\n    });\n  }\n}\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      arxivQueries,\n      openAlexTargets,\n      semanticTargets,\n      huggingfaceTargets\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nconst { domains = [], timeframe, config = {}, runContext = {} } = input;\n\nconst arxivQueries = [];\nconst openAlexTargets = [];\nconst semanticTargets = [];\nconst huggingfaceTargets = [];\nconst interestDomains = ['education', 'display-tech', 'led-display', 'led-lighting', 'healthcare-ai', 'elderly-care', 'software-dev', 'smart-hardware', 'image-processing', 'image-recognition', 'ai-general', 'nlp'];\n\nfor (const domain of domains) {\n  const baseWeight = domain.weight || 1;\n  const domainTags = Array.isArray(domain.labels) ? domain.labels : [];\n  const fallbackQuery = domain.queries?.[0] || '';\n\n  if (domain.id === 'global-top') {\n    arxivQueries.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'all:(ai OR \"machine learning\" OR \"deep learning\") AND submittedDate:[NOW-7DAY TO NOW]',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      maxResults: config.arxivMaxResults || 60\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      query: 'artificial intelligence',\n      domainId: domain.id,\n      domainTags,\n      weight: domain.weight || 1.2,\n      perPage: config.openAlexPerQuery || 40\n    });\n\n    huggingfaceTargets.push({\n      id: `${domain.id}-global`,\n      label: domain.label,\n      domainId: domain.id,\n      domainTags,\n      weight: 1.1,\n      limit: config.huggingFacePerQuery || 40\n    });\n  }\n\n  if (fallbackQuery) {\n    arxivQueries.push({\n      id: `${domain.id}-arxiv`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      maxResults: Math.min(config.arxivMaxResults || 60, domain.id === 'global-top' ? 60 : 45)\n    });\n\n    openAlexTargets.push({\n      id: `${domain.id}-openalex`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      perPage: Math.min(config.openAlexPerQuery || 40, 40)\n    });\n\n    semanticTargets.push({\n      id: `${domain.id}-semantic`,\n      label: domain.label,\n      query: fallbackQuery,\n      domainId: domain.id,\n      domainTags,\n      weight: baseWeight,\n      limit: Math.min(config.semanticPerQuery || 30, 30)\n    });\n  }\n}\n\nreturn [\n  {\n    json: {\n      runContext,\n      timeframe,\n      domains,\n      interestDomains,\n      arxivQueries,\n      openAlexTargets,\n      semanticTargets,\n      huggingfaceTargets\n    }\n  }\n];"
       },
       "id": "F61F593E-CCA0-4FAE-A2F5-A8ACDF278252",
       "name": "Build Sources",
@@ -204,6 +218,20 @@
     },
     {
       "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nlet prompt = input.prompt ?? '';\nif (typeof prompt !== 'string') {\n  prompt = String(prompt);\n}\n\nconst raw = input.rawInput || {};\nconst overallTop = Array.isArray(raw.overallTop) ? raw.overallTop : [];\nconst domainHighlights = Array.isArray(raw.domainHighlights) ? raw.domainHighlights : [];\n\nconst expectedTop = Math.min(10, overallTop.length);\nconst focusDomains = ['教育', '显示', '照明', '健康', '养老'];\n\nconst constraintLines = [\n  '',\n  '## 强制结构约束（必须逐条满足，否则输出视为无效）',\n  `- globalTop：必须基于输入 overallTop，保持顺序；当 overallTop ≥ ${expectedTop} 时，输出恰好 ${expectedTop} 篇；除非输入不足，不得少于 ${expectedTop}。`,\n  '- domains：必须覆盖输入 domainHighlights 中的每个域（保持输入顺序）；每个域至少 1 篇、最多 2 篇。',\n  '- domains 中每个域的 domainId/domainLabel 必须与输入一致；且只从该域对应的候选条目中选择。',\n  '- 选题必须与对应 domainId 相关；不要把无关论文硬塞进域里。',\n  '- meta.counts.overall 必须等于 globalTop 数组长度；meta.counts.domain 必须等于 domains 各组 items 总数。',\n  `- 重点关注领域：${focusDomains.join('、')}。若论文与这些领域相关，请在 whyItMatters/impactForBusiness 中明确指出与该领域的关系。`,\n  '- 如果输入提供了链接（link/pdfUrl 等），primaryLink 必须填可打开的 URL。',\n  '',\n  '只输出 JSON，不要额外解释。'\n];\n\nprompt = prompt.trimEnd() + '\\n' + constraintLines.join('\\n');\n\nreturn [\n  {\n    json: {\n      ...input,\n      prompt\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nlet prompt = input.prompt ?? '';\nif (typeof prompt !== 'string') {\n  prompt = String(prompt);\n}\n\nconst raw = input.rawInput || {};\nconst overallTop = Array.isArray(raw.overallTop) ? raw.overallTop : [];\nconst domainHighlights = Array.isArray(raw.domainHighlights) ? raw.domainHighlights : [];\n\nconst expectedTop = Math.min(10, overallTop.length);\nconst focusDomains = ['教育', '显示', '照明', '健康', '养老'];\n\nconst constraintLines = [\n  '',\n  '## 强制结构约束（必须逐条满足，否则输出视为无效）',\n  `- globalTop：必须基于输入 overallTop，保持顺序；当 overallTop ≥ ${expectedTop} 时，输出恰好 ${expectedTop} 篇；除非输入不足，不得少于 ${expectedTop}。`,\n  '- domains：必须覆盖输入 domainHighlights 中的每个域（保持输入顺序）；每个域至少 1 篇、最多 2 篇。',\n  '- domains 中每个域的 domainId/domainLabel 必须与输入一致；且只从该域对应的候选条目中选择。',\n  '- 选题必须与对应 domainId 相关；不要把无关论文硬塞进域里。',\n  '- meta.counts.overall 必须等于 globalTop 数组长度；meta.counts.domain 必须等于 domains 各组 items 总数。',\n  `- 重点关注领域：${focusDomains.join('、')}。若论文与这些领域相关，请在 whyItMatters/impactForBusiness 中明确指出与该领域的关系。`,\n  '- 如果输入提供了链接（link/pdfUrl 等），primaryLink 必须填可打开的 URL。',\n  '',\n  '只输出 JSON，不要额外解释。'\n];\n\nprompt = prompt.trimEnd() + '\\n' + constraintLines.join('\\n');\n\nreturn [\n  {\n    json: {\n      ...input,\n      prompt\n    }\n  }\n];"
+      },
+      "id": "6C17D0B2-8D4C-4D13-AE92-287455D36A7A",
+      "name": "Enhance Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        48
+      ]
+    },
+    {
+      "parameters": {
         "promptType": "define",
         "text": "={{$json.prompt}}",
         "model": "google/gemini-3-flash-preview"
@@ -250,6 +278,20 @@
       "typeVersion": 2,
       "position": [
         912,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0]?.json || {};\nlet markdown = input.markdown ?? '';\nif (typeof markdown !== 'string') {\n  markdown = String(markdown);\n}\n\nif (!markdown.includes('周报作者：卿培')) {\n  const footerLines = [\n    '---',\n    '周报作者：卿培',\n    '联系方式：edwardtoday@gmail.com',\n    '欢迎对信息源和分析方法提出改进建议。'\n  ];\n  markdown = markdown.trimEnd() + '\\n\\n' + footerLines.join('\\n');\n}\n\nreturn [\n  {\n    json: {\n      ...input,\n      markdown\n    }\n  }\n];",
+        "functionCode": "const input = items[0]?.json || {};\nlet markdown = input.markdown ?? '';\nif (typeof markdown !== 'string') {\n  markdown = String(markdown);\n}\n\nif (!markdown.includes('周报作者：卿培')) {\n  const footerLines = [\n    '---',\n    '周报作者：卿培',\n    '联系方式：edwardtoday@gmail.com',\n    '欢迎对信息源和分析方法提出改进建议。'\n  ];\n  markdown = markdown.trimEnd() + '\\n\\n' + footerLines.join('\\n');\n}\n\nreturn [\n  {\n    json: {\n      ...input,\n      markdown\n    }\n  }\n];"
+      },
+      "id": "821246C7-2C2E-454F-AEB1-0CC6AC63E99D",
+      "name": "Postprocess Markdown (Footer)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
         48
       ]
     },
@@ -428,6 +470,17 @@
       "main": [
         [
           {
+            "node": "Extend Domains",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extend Domains": {
+      "main": [
+        [
+          {
             "node": "Build Sources",
             "type": "main",
             "index": 0
@@ -472,6 +525,17 @@
       "main": [
         [
           {
+            "node": "Enhance Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enhance Prompt": {
+      "main": [
+        [
+          {
             "node": "Summarize Papers",
             "type": "main",
             "index": 0
@@ -502,6 +566,17 @@
       ]
     },
     "Prepare Markdown": {
+      "main": [
+        [
+          {
+            "node": "Postprocess Markdown (Footer)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postprocess Markdown (Footer)": {
       "main": [
         [
           {
