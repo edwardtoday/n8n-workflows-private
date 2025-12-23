@@ -133,6 +133,18 @@ _Last refreshed: 2025-10-23 13:45Z. Status reflects the post-fix workflow (execu
   - URL: <https://news.google.com/rss/search?q=%E7%81%AF%E5%85%89%20%E8%A7%84%E5%88%99%20when:7d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans>
   - Verification: HTTP 200 · `application/xml; charset=utf-8`
   - 聚焦照明标准、能耗规范与地方政策，辅助合规分析。
+- Google 新闻 RSS — `工程中标结果（gov.cn）`（近 7 天）
+  - URL: <https://news.google.com/rss/search?q=site%3Agov.cn%20%28%E5%85%AC%E5%85%B1%E8%B5%84%E6%BA%90%20OR%20%E4%BA%A4%E6%98%93%E4%B8%AD%E5%BF%83%20OR%20ggzy%29%20%28%22%E4%B8%AD%E6%A0%87%E7%BB%93%E6%9E%9C%E5%85%AC%E5%91%8A%22%20OR%20%22%E5%AE%9A%E6%A0%87%E7%BB%93%E6%9E%9C%E5%85%AC%E5%91%8A%22%20OR%20%22%E6%88%90%E4%BA%A4%E7%BB%93%E6%9E%9C%E5%85%AC%E5%91%8A%22%20OR%20%22%E7%BB%93%E6%9E%9C%E5%85%AC%E5%91%8A%22%29%20%28%E8%B7%AF%E7%81%AF%20OR%20%E9%81%93%E8%B7%AF%E7%85%A7%E6%98%8E%20OR%20%E6%99%BA%E6%85%A7%E8%B7%AF%E7%81%AF%20OR%20%E9%9A%A7%E9%81%93%E7%85%A7%E6%98%8E%20OR%20%E9%9A%A7%E9%81%93%E7%81%AF%20OR%20LED%E6%98%BE%E7%A4%BA%E5%B1%8F%20OR%20%E5%B0%8F%E9%97%B4%E8%B7%9D%29%20when%3A7d&hl=zh-CN&gl=CN&ceid=CN:zh>
+  - Use: 发现工程类中标/成交/定标“最终结果”公告线索；周报会在正文中解析金额并仅保留 ≥100 万的条目。
+- Google 新闻 RSS — `工程中标候选人（gov.cn）`（近 7 天）
+  - URL: <https://news.google.com/rss/search?q=site%3Agov.cn%20%28%E5%85%AC%E5%85%B1%E8%B5%84%E6%BA%90%20OR%20%E4%BA%A4%E6%98%93%E4%B8%AD%E5%BF%83%20OR%20ggzy%29%20%28%22%E4%B8%AD%E6%A0%87%E5%80%99%E9%80%89%E4%BA%BA%E5%85%AC%E7%A4%BA%22%20OR%20%22%E8%AF%84%E6%A0%87%E7%BB%93%E6%9E%9C%E5%85%AC%E7%A4%BA%22%29%20%28%E8%B7%AF%E7%81%AF%20OR%20%E9%81%93%E8%B7%AF%E7%85%A7%E6%98%8E%20OR%20%E6%99%BA%E6%85%A7%E8%B7%AF%E7%81%AF%20OR%20%E9%9A%A7%E9%81%93%E7%85%A7%E6%98%8E%20OR%20%E9%9A%A7%E9%81%93%E7%81%AF%20OR%20LED%E6%98%BE%E7%A4%BA%E5%B1%8F%20OR%20%E5%B0%8F%E9%97%B4%E8%B7%9D%29%20when%3A7d&hl=zh-CN&gl=CN&ceid=CN:zh>
+  - Use: 捕捉候选人公示/评标结果公示（仍会做金额解析与 ≥100 万过滤）。
+- Google 新闻 RSS — `中国招标投标公共服务平台（线索）`（近 7 天）
+  - URL: <https://news.google.com/rss/search?q=site%3Acebpubservice.com%20%28%22%E4%B8%AD%E6%A0%87%E7%BB%93%E6%9E%9C%22%20OR%20%22%E5%AE%9A%E6%A0%87%E7%BB%93%E6%9E%9C%22%20OR%20%22%E6%88%90%E4%BA%A4%E7%BB%93%E6%9E%9C%22%20OR%20%22%E4%B8%AD%E6%A0%87%E5%80%99%E9%80%89%E4%BA%BA%22%29%20%28%E8%B7%AF%E7%81%AF%20OR%20%E9%9A%A7%E9%81%93%E7%85%A7%E6%98%8E%20OR%20LED%E6%98%BE%E7%A4%BA%E5%B1%8F%29%20when%3A7d&hl=zh-CN&gl=CN&ceid=CN:zh>
+  - Use: 全国线索入口（最终证据仍以 gov.cn 原公告页为准）。
+- Google 新闻 RSS — `中国政府采购网（补漏）`（近 7 天）
+  - URL: <https://news.google.com/rss/search?q=site%3Accgp.gov.cn%20%28%22%E4%B8%AD%E6%A0%87%E5%85%AC%E5%91%8A%22%20OR%20%22%E6%88%90%E4%BA%A4%E5%85%AC%E5%91%8A%22%20OR%20%22%E7%BB%93%E6%9E%9C%E5%85%AC%E5%91%8A%22%29%20%28%E8%B7%AF%E7%81%AF%20OR%20%E9%9A%A7%E9%81%93%E7%85%A7%E6%98%8E%20OR%20LED%E6%98%BE%E7%A4%BA%E5%B1%8F%29%20when%3A7d&hl=zh-CN&gl=CN&ceid=CN:zh>
+  - Use: 补漏走政府采购口径的工程/设备项目。
 - 360 搜索 — `LED显示` 新闻
   - URL: <https://www.so.com/s?q=LED%E6%98%BE%E7%A4%BA&ie=utf-8>
   - Verification: HTTP 200 · `text/html; charset=UTF-8`
